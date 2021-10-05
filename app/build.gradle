@@ -2,6 +2,7 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'com.jakewharton.butterknife'
 }
 
 android {
@@ -50,9 +51,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     /** CameraX **/
-    def camerax_version = "1.0.1"
+    def camerax_version = '1.0.1'
     implementation "androidx.camera:camera-camera2:$camerax_version"
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
-    implementation "androidx.camera:camera-view:1.0.0-alpha27"
+    implementation 'androidx.camera:camera-view:1.0.0-alpha27'
+
+    /** ButterKnife **/
+    implementation 'com.jakewharton:butterknife:10.1.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
+
 
 }
