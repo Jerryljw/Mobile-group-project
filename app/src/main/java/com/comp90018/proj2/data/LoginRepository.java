@@ -1,8 +1,16 @@
 package com.comp90018.proj2.data;
 
+import android.util.Log;
+
 import com.comp90018.proj2.data.model.LoggedInUser;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginRepository {
+
+    private String TAG = "LoginRepository";
+
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     private static volatile LoginRepository instance;
 
@@ -39,11 +47,12 @@ public class LoginRepository {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<LoggedInUser> login(String username, String password) {
+    public Result<FirebaseUser> login(String email, String password) {
         // handle login
-        Result<LoggedInUser> result = dataSource.login(username, password);
+        Result<FirebaseUser> result = dataSource.login(email, password);
         if (result instanceof Result.Success) {
-            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
+            Log.i(TAG, "login: " + ((Result.Success<?>) result).getData());
+//            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }
         return result;
     }
