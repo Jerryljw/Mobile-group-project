@@ -38,25 +38,25 @@ public class LoginDataSource {
 
         try {
             // TODO: handle loggedInUser authentication
+            // [START sign_in_with_email]
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(context.getMainExecutor(), new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
-                                Log.d(TAG, "signInWithEmail: success");
-                                Log.d(TAG, task.getResult().toString());
-
+                                Log.d(TAG, "signInWithEmail:success");
                                 user[0] = mAuth.getCurrentUser();
                             } else {
                                 // If sign in fails, display a message to the user.
-                                Log.d(TAG, "signInWithEmail: fail");
-                                user[0] = null;
+                                Log.w(TAG, "signInWithEmail:failure", task.getException());
                             }
                         }
                     });
+            // [END sign_in_with_email]
 
-            return new Result.Success<>(user[0]);
+            return new Result.Success<>(mAuth.getCurrentUser());
+//            else return new Result.Error(new IOException("Error logging in"));
         } catch (Exception e) {
             return new Result.Error(new IOException("Error logging in", e));
         }

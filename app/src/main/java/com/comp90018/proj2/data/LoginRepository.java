@@ -10,8 +10,6 @@ public class LoginRepository {
 
     private String TAG = "LoginRepository";
 
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
     private static volatile LoginRepository instance;
 
     private LoginDataSource dataSource;
