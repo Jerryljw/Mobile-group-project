@@ -1,4 +1,5 @@
 <resources>
+    <!-- Main -->
     <string name="app_name">Project2</string>
     <string name="title_find">Find</string>
     <string name="title_map">Map</string>
@@ -14,5 +15,8 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="action_log_out">Logout</string>
+
+    <!-- Map -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBfmr1rVOy-KeXKioqwzjzEMKIQ0Fow4ek</string>
 
 </resources>
