@@ -82,20 +82,17 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
         // Camera Button
         bCaptureImage = binding.cameraCaptureButton;
-        bCaptureImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "bCaptureImage Click:");
+        bCaptureImage.setOnClickListener(view -> {
+            Log.d(TAG, "bCaptureImage Click:");
 
-                if (allPermissionsGranted()) {
-                    startCamera();
-                } else {
-                    ActivityCompat.requestPermissions(
-                            requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-                }
+            if (allPermissionsGranted()) {
+                startCamera();
+            } else {
+                ActivityCompat.requestPermissions(
+                        requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
+            }
 
 //                openCameraIntent();
-            }
         });
 
 

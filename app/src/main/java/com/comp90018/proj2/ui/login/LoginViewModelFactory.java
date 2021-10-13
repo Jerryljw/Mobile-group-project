@@ -6,9 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.comp90018.proj2.data.LoginDataSource;
-import com.comp90018.proj2.data.LoginRepository;
-
 public class LoginViewModelFactory implements ViewModelProvider.Factory {
 
     private Context context;
@@ -22,8 +19,7 @@ public class LoginViewModelFactory implements ViewModelProvider.Factory {
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(LoginViewModel.class)) {
-            return (T) new LoginViewModel(
-                    LoginRepository.getInstance(new LoginDataSource(context)));
+            return (T) new LoginViewModel();
         } else {
             throw new IllegalArgumentException("Unknown ViewModel class");
         }
