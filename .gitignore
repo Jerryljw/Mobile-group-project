@@ -85,3 +85,4 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 local.properties
+local.properties
