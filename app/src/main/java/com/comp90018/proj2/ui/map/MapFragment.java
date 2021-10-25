@@ -3,6 +3,7 @@ package com.comp90018.proj2.ui.map;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +11,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,7 +43,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,9 +61,10 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 
-public class MapFragment extends Fragment implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener{
+public class MapFragment extends Fragment implements View.OnClickListener,
+        OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
-    private String TAG = "Map Page";
+    private String TAG = "MapFrag";
 
     private MapViewModel mapViewModel;
     private FragmentMapBinding binding;
@@ -62,6 +73,25 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
     private GoogleMap map;
     private MapView mapView;
+
+    // A default location (Sydney, Australia) and default zoom to use when location permission is
+    // not granted.
+    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private static final int DEFAULT_ZOOM = 15;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean locationPermissionGranted;
+
+    // The geographical location where the device is currently located. That is, the last-known
+    // location retrieved by the Fused Location Provider.
+    private Location lastKnownLocation;
+
+    // Keys for storing activity state.
+    // [START maps_current_place_state_keys]
+    private static final String KEY_CAMERA_POSITION = "camera_position";
+    private static final String KEY_LOCATION = "location";
+    // [END maps_current_place_state_keys]
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private final int PREFERED_IMAGE_WIDTH_SIZE = 1200;
 
@@ -75,8 +105,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                              ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView");
 
-        mapViewModel =
-                new ViewModelProvider(this).get(MapViewModel.class);
+        setHasOptionsMenu(true);
+
+        mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
 
         binding = FragmentMapBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -112,8 +143,44 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 //                openCameraIntent();
         });
 
-
         return root;
+    }
+
+    /* Setup Menu */
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.map_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Toast.makeText(getContext(), "Go to New Post Activity", Toast.LENGTH_SHORT).show();
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void getPosts() {
+        db.collection("Post")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                GeoPoint postLocation = (GeoPoint) document.getData().get("PostLocation");
+                                if (postLocation != null) {
+                                    LatLng latLng = new LatLng(postLocation.getLatitude(), postLocation.getLongitude());
+                                    map.addMarker(new MarkerOptions().position(latLng).title("Post Marker"));
+                                }
+
+                            }
+
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
     }
 
     /**
@@ -134,12 +201,75 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
         map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 14f));
+
+        getPosts();
     }
 
     @Override
     public void onInfoWindowClick(@NonNull Marker marker) {
-        Toast.makeText(getContext().getApplicationContext(), "Info window clicked", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Info window clicked", Toast.LENGTH_SHORT).show();
     }
+
+    /**
+     * Saves the state of the map when the activity is paused.
+     */
+    // [START maps_current_place_on_save_instance_state]
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (map != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, map.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, lastKnownLocation);
+        }
+        super.onSaveInstanceState(outState);
+    }
+    // [END maps_current_place_on_save_instance_state]
+
+    /**
+     * Prompts the user for permission to use the device location.
+     */
+    // [START maps_current_place_location_permission]
+    private void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(getContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+
+        } else {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+    // [END maps_current_place_location_permission]
+
+//    /**
+//     * Handles the result of the request for location permissions.
+//     */
+//    // [START maps_current_place_on_request_permissions_result]
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode,
+//                                           @NonNull String[] permissions,
+//                                           @NonNull int[] grantResults) {
+//        locationPermissionGranted = false;
+//        switch (requestCode) {
+//            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    locationPermissionGranted = true;
+//                }
+//            }
+//        }
+//        updateLocationUI();
+//    }
+//    // [END maps_current_place_on_request_permissions_result]
+
+
 
 
     private boolean allPermissionsGranted() {
