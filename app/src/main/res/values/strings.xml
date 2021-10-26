@@ -18,6 +18,7 @@
 
     <!-- Map -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBfmr1rVOy-KeXKioqwzjzEMKIQ0Fow4ek</string>
+    <string name="action_promote_send_post">Send Post</string>
 
     <!-- Send Post -->
     <string name="prompt_post_type">Post Type</string>

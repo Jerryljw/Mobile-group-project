@@ -1,6 +1,5 @@
 package com.comp90018.proj2.ui.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -32,6 +31,7 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
+    // Initialize
     private String TAG = "LoginActivity";
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
