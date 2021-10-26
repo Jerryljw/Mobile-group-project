@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -222,6 +223,8 @@ public class MapFragment extends Fragment
         map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 14f));
 
+        View mapView = mapFragment.getView();
+        moveCompassButton(mapView);
         getPosts();
     }
 
@@ -307,6 +310,35 @@ public class MapFragment extends Fragment
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getChildFragmentManager(), "dialog");
+    }
+
+    /**
+     * Move the compass button to the right side, centered vertically.
+     */
+    private void moveCompassButton(View mapView) {
+        try {
+            assert mapView != null; // skip this if the mapView has not been set yet
+
+            Log.d(TAG, "moveCompassButton()");
+
+            // View view = mapView.findViewWithTag("GoogleMapCompass");
+            View view = mapView.findViewWithTag("GoogleMapMyLocationButton");
+
+            // move the compass button to the right side, centered
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
+            layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+            layoutParams.setMarginEnd(18);
+
+            view.setLayoutParams(layoutParams);
+        } catch (Exception ex) {
+            Log.e(TAG, "moveCompassButton() - failed: " + ex.getLocalizedMessage());
+            ex.printStackTrace();
+        }
     }
 
     private boolean allPermissionsGranted() {
