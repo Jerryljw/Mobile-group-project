@@ -8,7 +8,7 @@
     <!-- Login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in">Sign In</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
@@ -18,5 +18,18 @@
 
     <!-- Map -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBfmr1rVOy-KeXKioqwzjzEMKIQ0Fow4ek</string>
+
+    <!-- Send Post -->
+    <string name="prompt_post_type">Post Type</string>
+    <string name="prompt_post_species">Post Species</string>
+    <string name="prompt_post_location">Your Location</string>
+    <string name="prompt_post_lon">Longitude</string>
+    <string name="prompt_post_lat">Latitude</string>
+    <string name="action_send_post">Send Post</string>
+
+
+
+
+
 
 </resources>
