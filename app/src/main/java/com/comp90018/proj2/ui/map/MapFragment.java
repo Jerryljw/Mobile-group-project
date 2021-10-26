@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -61,8 +62,12 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 
-public class MapFragment extends Fragment implements View.OnClickListener,
-        OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
+public class MapFragment extends Fragment
+        implements
+        View.OnClickListener,
+        OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMyLocationButtonClickListener {
 
     private String TAG = "MapFrag";
 
@@ -72,7 +77,7 @@ public class MapFragment extends Fragment implements View.OnClickListener,
     private Button bCaptureImage;
 
     private GoogleMap map;
-    private MapView mapView;
+    private SupportMapFragment mapFragment;
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
@@ -80,6 +85,12 @@ public class MapFragment extends Fragment implements View.OnClickListener,
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
+
+    /**
+     * Flag indicating whether a requested permission has been denied after returning in
+     * {@link #onRequestPermissionsResult(int, String[], int[])}.
+     */
+    private boolean permissionDenied = false;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -101,6 +112,13 @@ public class MapFragment extends Fragment implements View.OnClickListener,
     private int REQUEST_CODE_PERMISSIONS = 1001;
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
 
+    /**
+     * Request code for location permission request.
+     *
+     * @see #onRequestPermissionsResult(int, String[], int[])
+     */
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView");
@@ -112,12 +130,11 @@ public class MapFragment extends Fragment implements View.OnClickListener,
         binding = FragmentMapBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
         // Map
-        mapView = binding.mapView;
-        mapView.onCreate(savedInstanceState);
-        mapView.onResume();
-        mapView.getMapAsync(this);
+        mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map_frag);
+        mapFragment.getMapAsync(this);
+
 
         // Text
         final TextView textView = binding.textMap;
@@ -195,7 +212,10 @@ public class MapFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
-        googleMap.setOnInfoWindowClickListener(this);
+        map.setOnInfoWindowClickListener(this);
+        map.setOnMyLocationButtonClickListener(this);
+        enableMyLocation();
+
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
 
@@ -208,6 +228,14 @@ public class MapFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onInfoWindowClick(@NonNull Marker marker) {
         Toast.makeText(getContext(), "Info window clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Toast.makeText(getContext(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+        return false;
     }
 
     /**
@@ -225,52 +253,61 @@ public class MapFragment extends Fragment implements View.OnClickListener,
     // [END maps_current_place_on_save_instance_state]
 
     /**
-     * Prompts the user for permission to use the device location.
+     * Enables the My Location layer if the fine location permission has been granted.
      */
-    // [START maps_current_place_location_permission]
-    private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
-        if (ContextCompat.checkSelfPermission(getContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
+    private void enableMyLocation() {
+        // [START maps_check_location_permission]
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            locationPermissionGranted = true;
-
+            if (map != null) {
+                map.setMyLocationEnabled(true);
+            }
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            // Permission to access the location is missing. Show rationale and request permission
+            PermissionUtils.requestPermission((AppCompatActivity) getActivity(), LOCATION_PERMISSION_REQUEST_CODE,
+                    Manifest.permission.ACCESS_FINE_LOCATION, true);
+        }
+        // [END maps_check_location_permission]
+    }
+
+    // [START maps_check_location_permission_result]
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+            return;
+        }
+
+        if (PermissionUtils.isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Enable the my location layer if the permission has been granted.
+            enableMyLocation();
+        } else {
+            // Permission was denied. Display an error message
+            // [START_EXCLUDE]
+            // Display the missing permission error dialog when the fragments resume.
+            permissionDenied = true;
+            // [END_EXCLUDE]
         }
     }
-    // [END maps_current_place_location_permission]
-
-//    /**
-//     * Handles the result of the request for location permissions.
-//     */
-//    // [START maps_current_place_on_request_permissions_result]
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode,
-//                                           @NonNull String[] permissions,
-//                                           @NonNull int[] grantResults) {
-//        locationPermissionGranted = false;
-//        switch (requestCode) {
-//            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-//                // If request is cancelled, the result arrays are empty.
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    locationPermissionGranted = true;
-//                }
-//            }
-//        }
-//        updateLocationUI();
-//    }
-//    // [END maps_current_place_on_request_permissions_result]
+    // [END maps_check_location_permission_result]
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (permissionDenied) {
+            // Permission was not granted, display error dialog.
+            showMissingPermissionError();
+            permissionDenied = false;
+        }
+    }
 
+    /**
+     * Displays a dialog with error message explaining that the location permission is missing.
+     */
+    private void showMissingPermissionError() {
+        PermissionUtils.PermissionDeniedDialog
+                .newInstance(true).show(getChildFragmentManager(), "dialog");
+    }
 
     private boolean allPermissionsGranted() {
         for (String permission : REQUIRED_PERMISSIONS) {
