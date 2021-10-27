@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal">
+            <!--animals-->
+            <TextView
+                android:id="@+id/animal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6dp"
+                android:text="Fauna"
+                android:textColor="#333333"
+                android:textSize="20sp" />
+            <!-- vertical line-->
+            <View
+                android:id="@+id/verticalline"
+                android:layout_width="1dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/animal"
+                android:background="#333333" />
+            <!--plants-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_toRightOf="@+id/verticalline"
+                android:text="Flora"
+                android:textColor="#333333"
+                android:textSize="20sp" />
+        </RelativeLayout>
+        <!--more-->
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/ic_starter_more" />
+    </RelativeLayout>
+    <!--selector-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal">
+        <!--sort-->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/ic_starter_sort" />
+        <!--        &lt;!&ndash;搜索&ndash;&gt;-->
+        <!--        <EditText-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_gravity="center_vertical"-->
+        <!--            android:hint="搜索"-->
+        <!--            android:background="@null"-->
+        <!--            android:textColorHint="#aaa"/>-->
+        <!--background=none用于隐藏下划线-->
+    </LinearLayout>
+    <!--line between card items and sort-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="5dp"
+        android:background="#333333" />
+
+
+    <!--中间存放item，这个RelativeLayout是为了展示item的地方占满屏，把菜单栏挤到最底端-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="#f2f2f2">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/home_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2.5dp"
+            android:layout_weight="1" />
+    </RelativeLayout>
+
+    <!--line at the bottom of the navigation-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_gravity="bottom"
+        android:background="#333" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+
+        android:orientation="horizontal"></LinearLayout>
+
+</LinearLayout>

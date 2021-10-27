@@ -3,6 +3,7 @@ package com.comp90018.proj2.ui.map;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,14 +11,19 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -31,6 +37,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.FragmentMapBinding;
+import com.comp90018.proj2.ui.login.LoginActivity;
+import com.comp90018.proj2.ui.post.PostActivity;
+import com.comp90018.proj2.ui.sendPost.SendPostActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -39,7 +48,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,9 +66,15 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 
-public class MapFragment extends Fragment implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener{
+public class MapFragment extends Fragment
+        implements
+        View.OnClickListener,
+        OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMarkerClickListener {
 
-    private String TAG = "Map Page";
+    private String TAG = "MapFrag";
 
     private MapViewModel mapViewModel;
     private FragmentMapBinding binding;
@@ -61,32 +82,59 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     private Button bCaptureImage;
 
     private GoogleMap map;
-    private MapView mapView;
+    private SupportMapFragment mapFragment;
 
-    private final int PREFERED_IMAGE_WIDTH_SIZE = 1200;
+    // A default location (Sydney, Australia) and default zoom to use when location permission is
+    // not granted.
+    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private static final int DEFAULT_ZOOM = 15;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean locationPermissionGranted;
 
-    private final int CAMERA_PERMISSION_CODE = 300;
-    private final int RESULT_CAMERA_LOAD_IMG = 1889;
+    /**
+     * Flag indicating whether a requested permission has been denied after returning in
+     * {@link #onRequestPermissionsResult(int, String[], int[])}.
+     */
+    private boolean permissionDenied = false;
+
+    // The geographical location where the device is currently located. That is, the last-known
+    // location retrieved by the Fused Location Provider.
+    private Location lastKnownLocation;
+
+    // Keys for storing activity state.
+    // [START maps_current_place_state_keys]
+    private static final String KEY_CAMERA_POSITION = "camera_position";
+    private static final String KEY_LOCATION = "location";
+    // [END maps_current_place_state_keys]
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private int REQUEST_CODE_PERMISSIONS = 1001;
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
+
+    /**
+     * Request code for location permission request.
+     *
+     * @see #onRequestPermissionsResult(int, String[], int[])
+     */
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView");
 
-        mapViewModel =
-                new ViewModelProvider(this).get(MapViewModel.class);
+        setHasOptionsMenu(true);
+
+        mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
 
         binding = FragmentMapBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
         // Map
-        mapView = binding.mapView;
-        mapView.onCreate(savedInstanceState);
-        mapView.onResume();
-        mapView.getMapAsync(this);
+        mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map_frag);
+        mapFragment.getMapAsync(this);
+
 
         // Text
         final TextView textView = binding.textMap;
@@ -102,18 +150,50 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         bCaptureImage.setOnClickListener(view -> {
             Log.d(TAG, "bCaptureImage Click:");
 
-            if (allPermissionsGranted()) {
-                startCamera();
-            } else {
-                ActivityCompat.requestPermissions(
-                        requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-            }
-
-//                openCameraIntent();
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), SendPostActivity.class);
+            startActivity(intent);
         });
 
-
         return root;
+    }
+
+    /* Setup Menu */
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.map_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Toast.makeText(getContext(), "Go to New Post Activity", Toast.LENGTH_SHORT).show();
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void getPosts() {
+        db.collection("Post")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                GeoPoint postLocation = (GeoPoint) document.getData().get("PostLocation");
+                                if (postLocation != null) {
+                                    LatLng latLng = new LatLng(postLocation.getLatitude(), postLocation.getLongitude());
+                                    map.addMarker(new MarkerOptions().position(latLng).
+                                            title("Post Marker")).setTag(document.getId());
+                                }
+
+                            }
+
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
     }
 
     /**
@@ -128,83 +208,144 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
-        googleMap.setOnInfoWindowClickListener(this);
+        map.setOnInfoWindowClickListener(this);
+        map.setOnMyLocationButtonClickListener(this);
+        map.setOnMarkerClickListener(this);
+        enableMyLocation();
+
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
 
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 14f));
+
+        View mapView = mapFragment.getView();
+        moveCompassButton(mapView);
+        getPosts();
     }
 
     @Override
     public void onInfoWindowClick(@NonNull Marker marker) {
-        Toast.makeText(getContext().getApplicationContext(), "Info window clicked", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Info window clicked", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Toast.makeText(getContext(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+        return false;
+    }
 
-    private boolean allPermissionsGranted() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(
-                    requireActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        Intent intent = new Intent(getActivity(), PostActivity.class);
+        Bundle bundle = new Bundle();
+        Log.e(TAG, marker.getTag().toString());
+        bundle.putString("postId", marker.getTag().toString());
+        intent.putExtras(bundle);
+        startActivity(intent);
+        return false;
+    }
+
+    /**
+     * Saves the state of the map when the activity is paused.
+     */
+    // [START maps_current_place_on_save_instance_state]
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (map != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, map.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, lastKnownLocation);
         }
-        return true;
+        super.onSaveInstanceState(outState);
+    }
+    // [END maps_current_place_on_save_instance_state]
+
+    /**
+     * Enables the My Location layer if the fine location permission has been granted.
+     */
+    private void enableMyLocation() {
+        // [START maps_check_location_permission]
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (map != null) {
+                map.setMyLocationEnabled(true);
+            }
+        } else {
+            // Permission to access the location is missing. Show rationale and request permission
+            PermissionUtils.requestPermission((AppCompatActivity) getActivity(), LOCATION_PERMISSION_REQUEST_CODE,
+                    Manifest.permission.ACCESS_FINE_LOCATION, true);
+        }
+        // [END maps_check_location_permission]
     }
 
-    public void startCamera() {
-        ListenableFuture<ProcessCameraProvider>
-                cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext());
-        cameraProviderFuture.addListener(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        openCameraIntent();
-                    }
-                },
-                ActivityCompat.getMainExecutor(requireContext())
-        );
-    }
+    // [START maps_check_location_permission_result]
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+            return;
+        }
 
-    private void openCameraIntent() {
-        Log.d(TAG, "openCameraIntent: ");
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            //Create a file to store the image
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            if (photoFile != null) {
-//                photoFile.getName();
-//                Uri photoURI = FileProvider.getUriForFile(requireContext(), photoFile);
-//                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//                startActivityForResult(cameraIntent, RESULT_CAMERA_LOAD_IMG);
-            }
+        if (PermissionUtils.isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Enable the my location layer if the permission has been granted.
+            enableMyLocation();
+        } else {
+            // Permission was denied. Display an error message
+            // [START_EXCLUDE]
+            // Display the missing permission error dialog when the fragments resume.
+            permissionDenied = true;
+            // [END_EXCLUDE]
+        }
+    }
+    // [END maps_check_location_permission_result]
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (permissionDenied) {
+            // Permission was not granted, display error dialog.
+            showMissingPermissionError();
+            permissionDenied = false;
         }
     }
 
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                Locale.ENGLISH).format(new Date());
-        String imageFileName = "IMG_" + timeStamp + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        Log.d(TAG, "createImageFile: " + image.getAbsolutePath());
-//        imagesFilesPaths.add(image.getAbsolutePath());
-        return image;
+    /**
+     * Displays a dialog with error message explaining that the location permission is missing.
+     */
+    private void showMissingPermissionError() {
+        PermissionUtils.PermissionDeniedDialog
+                .newInstance(true).show(getChildFragmentManager(), "dialog");
     }
 
+    /**
+     * Move the compass button to the right side, centered vertically.
+     */
+    private void moveCompassButton(View mapView) {
+        try {
+            assert mapView != null; // skip this if the mapView has not been set yet
 
-    public interface camera {
-        void captureImage();
+            Log.d(TAG, "moveCompassButton()");
+
+            // View view = mapView.findViewWithTag("GoogleMapCompass");
+            View view = mapView.findViewWithTag("GoogleMapMyLocationButton");
+
+            // move the compass button to the right side, centered
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
+            layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+            layoutParams.setMarginEnd(18);
+
+            view.setLayoutParams(layoutParams);
+        } catch (Exception ex) {
+            Log.e(TAG, "moveCompassButton() - failed: " + ex.getLocalizedMessage());
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -218,5 +359,4 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         switch (view.getId()) {
         }
     }
-
 }
