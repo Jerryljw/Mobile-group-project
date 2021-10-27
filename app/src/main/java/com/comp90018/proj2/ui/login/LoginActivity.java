@@ -1,6 +1,5 @@
 package com.comp90018.proj2.ui.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -22,11 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivityLoginBinding;
-import com.comp90018.proj2.databinding.ActivityMainBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseNetworkException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -36,6 +31,7 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
+    // Initialize
     private String TAG = "LoginActivity";
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
@@ -149,7 +145,7 @@ public class LoginActivity extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
                     } else {
-                        showLoginFailed(null);
+//                        showLoginFailed(null);
                         // If sign in fails, display a message to the user.
                         try {
                             throw Objects.requireNonNull(task.getException());
