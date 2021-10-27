@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#fff">
+    android:background="#fff"
+    android:orientation="vertical">
 
     // back to starter button
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -30,19 +30,20 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_marginTop="5dp"
-        android:background="#333333"/>
+        android:background="#333333" />
 
     <!--personal information-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="3.0"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_weight="3.0">
             <!--username-->
             <ImageView
-                android:id=  "@+id/post_userhead"
+                android:id="@+id/post_userhead"
                 android:layout_width="20dp"
                 android:layout_height="17dp"
                 android:layout_gravity="center"
@@ -63,8 +64,8 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1.0"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0">
             <!--username-->
             <TextView
                 android:layout_width="wrap_content"
@@ -74,9 +75,11 @@
                 android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/userid"
             android:layout_width="wrap_content"
@@ -156,45 +159,49 @@
                         android:layout_marginTop="20dp"
                         android:layout_marginRight="20dp"
                         android:src="@drawable/ic_post_comment" />
+
                 </LinearLayout>
 
             </LinearLayout>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
                 android:layout_marginTop="5dp"
                 android:background="#333333" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp">
-                <TextView
-                    android:id="@+id/comment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="6dp"
-                    android:text="Comments"
-                    android:textColor="#333333"
-                    android:textSize="20sp" />
-                <!-- vertical line-->
-                <View
-                    android:id="@+id/post_verticalline"
-                    android:layout_width="1dp"
-                    android:layout_height="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_toRightOf="@+id/comment"
-                    android:background="#333333" />
-                <!--plants-->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="6dp"
-                    android:layout_toRightOf="@+id/post_verticalline"
-                    android:text="Science"
-                    android:textColor="#333333"
-                    android:textSize="20sp" />
-            </LinearLayout>
+                android:layout_marginLeft="10dp"
+                android:id="@+id/send_comment_layout">
 
+                <!-- vertical line-->
+                <Button
+                    android:id="@+id/comment_button"
+                    android:layout_width="1dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="comment" />
+
+                <!--plants-->
+
+                <EditText
+                    android:id="@+id/comment_edit_multiline_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine" />
+
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/comments_recycle_view"
+
+                />
             <!--            <TextView-->
             <!--                android:id="@+id/home_item_title"-->
             <!--                android:layout_width="match_parent"-->
@@ -204,11 +211,14 @@
             <!--                android:text="Location"-->
             <!--                android:textColor="#333" />-->
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
+            id
         </LinearLayout>
+
+
     </RelativeLayout>
 
 
@@ -216,8 +226,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="#333"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:background="#333" />
 
 
 </LinearLayout>
