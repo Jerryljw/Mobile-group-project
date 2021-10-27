@@ -35,7 +35,7 @@
         android:background="@drawable/ic_capture_button"
         android:elevation="2dp"
         android:scaleType="fitCenter"
-        android:text="Capture Photo"
+        android:text="@string/action_promote_send_post"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

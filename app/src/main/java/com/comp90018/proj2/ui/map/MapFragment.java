@@ -37,6 +37,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.FragmentMapBinding;
+import com.comp90018.proj2.ui.login.LoginActivity;
+import com.comp90018.proj2.ui.sendPost.SendPostActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -105,11 +107,6 @@ public class MapFragment extends Fragment
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private final int PREFERED_IMAGE_WIDTH_SIZE = 1200;
-
-    private final int CAMERA_PERMISSION_CODE = 300;
-    private final int RESULT_CAMERA_LOAD_IMG = 1889;
-
     private int REQUEST_CODE_PERMISSIONS = 1001;
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
 
@@ -151,14 +148,9 @@ public class MapFragment extends Fragment
         bCaptureImage.setOnClickListener(view -> {
             Log.d(TAG, "bCaptureImage Click:");
 
-            if (allPermissionsGranted()) {
-                startCamera();
-            } else {
-                ActivityCompat.requestPermissions(
-                        requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-            }
-
-//                openCameraIntent();
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), SendPostActivity.class);
+            startActivity(intent);
         });
 
         return root;
@@ -339,71 +331,6 @@ public class MapFragment extends Fragment
             Log.e(TAG, "moveCompassButton() - failed: " + ex.getLocalizedMessage());
             ex.printStackTrace();
         }
-    }
-
-    private boolean allPermissionsGranted() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(
-                    requireActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public void startCamera() {
-        ListenableFuture<ProcessCameraProvider>
-                cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext());
-        cameraProviderFuture.addListener(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        openCameraIntent();
-                    }
-                },
-                ActivityCompat.getMainExecutor(requireContext())
-        );
-    }
-
-    private void openCameraIntent() {
-        Log.d(TAG, "openCameraIntent: ");
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            //Create a file to store the image
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            if (photoFile != null) {
-//                photoFile.getName();
-//                Uri photoURI = FileProvider.getUriForFile(requireContext(), photoFile);
-//                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//                startActivityForResult(cameraIntent, RESULT_CAMERA_LOAD_IMG);
-            }
-        }
-    }
-
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                Locale.ENGLISH).format(new Date());
-        String imageFileName = "IMG_" + timeStamp + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        Log.d(TAG, "createImageFile: " + image.getAbsolutePath());
-//        imagesFilesPaths.add(image.getAbsolutePath());
-        return image;
-    }
-
-
-    public interface camera {
-        void captureImage();
     }
 
     @Override

@@ -13,9 +13,6 @@ public class LoginViewModel extends ViewModel {
 
     private String TAG = "LoginViewModel";
 
-
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
 
     LoginViewModel() { }
