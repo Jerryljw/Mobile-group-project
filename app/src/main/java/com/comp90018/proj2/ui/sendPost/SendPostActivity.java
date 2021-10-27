@@ -6,21 +6,43 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.comp90018.proj2.databinding.ActivitySendPostBinding;
+import com.comp90018.proj2.ui.login.LoginFormState;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SendPostActivity extends AppCompatActivity {
 
@@ -28,6 +50,15 @@ public class SendPostActivity extends AppCompatActivity {
     private String TAG = "SendPostActivity";
     private SendPostViewModel sendPostViewModel;
     private ActivitySendPostBinding binding;
+
+    // Fields
+    EditText textPostLat;
+    EditText textPostLon;
+    EditText textPostType;
+    EditText textPostSpecies;
+    Button sendPostButton;
+    ProgressBar loadingProgressBar;
+
 
     /**
      * Request code for location permission request.
@@ -41,8 +72,11 @@ public class SendPostActivity extends AppCompatActivity {
     private boolean locationPermissionGranted = false;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
-    /** Auth */
+    /**
+     * Auth
+     */
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onStart() {
@@ -66,15 +100,82 @@ public class SendPostActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate: ");
 
-        // Latitude: add observer
-        final EditText textPostLat = binding.textPostLat;
+
+        textPostLat = binding.textPostLat;
+        textPostLon = binding.textPostLon;
+        textPostType = binding.textPostType;
+        textPostSpecies = binding.textPostSpecies;
+        sendPostButton = binding.sendPost;
+        loadingProgressBar = binding.loading;
+
+
+        // Latitude & Longitude: onChange Validation
+        TextWatcher locationTextWatcher = getLocationTextWatcher();
+        textPostLat.addTextChangedListener(locationTextWatcher);
+        textPostLon.addTextChangedListener(locationTextWatcher);
+
+
+        // Latitude: add Observer
         sendPostViewModel.getLatitude().observe(this, textPostLat::setText);
 
-        // Longitude: add observer
-        final EditText textPostLon = binding.textPostLon;
+        // Longitude: add Observer
         sendPostViewModel.getLongitude().observe(this, textPostLon::setText);
+
+
+        sendPostViewModel.getSendPostFormState().observe(this, sendPostFormState -> {
+            if (sendPostFormState == null) {
+                return;
+            }
+            sendPostButton.setEnabled(sendPostFormState.isDataValid());
+        });
+
+        textPostLon.setEnabled(false);
+        textPostLat.setEnabled(false);
+
+        // sendPostButton: add ClickListener
+        sendPostButton.setOnClickListener(v -> {
+            Log.i(TAG, "onClick: ");
+            loadingProgressBar.setVisibility(View.VISIBLE);
+
+            // [START send post]
+            post();
+            // [END send post]
+
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+        });
     }
 
+    /**
+     * Send Post to the Firestore
+     */
+    private void post() {
+        Log.i(TAG, "bSendPostButton: clicked");
+
+        // Test
+        Map<String, Object> user = new HashMap<>();
+        user.put("PostImage", "PostImage");
+        user.put("PostLocation", new GeoPoint(Double.parseDouble(textPostLat.getText().toString()),
+                Double.parseDouble(textPostLon.getText().toString())));
+        user.put("PostSpecies", textPostSpecies.getText().toString());
+        user.put("PostTime", new Timestamp(new Date(System.currentTimeMillis())));
+        user.put("PostType", textPostType.getText().toString());
+        user.put("UserId", mAuth.getUid());
+
+        db.collection("Post")
+                .add(user)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
+    }
 
     /**
      * Enables the My Location layer if the fine location permission has been granted.
@@ -118,7 +219,7 @@ public class SendPostActivity extends AppCompatActivity {
                             if (lastKnownLocation != null) {
                                 Log.i(TAG, "Your Location: " + "\n" + "Latitude: " +
                                         lastKnownLocation.getLatitude() + "\n" + "Longitude: " + lastKnownLocation.getLongitude());
-                                sendPostViewModel.updateLocation(lastKnownLocation.getLongitude(), lastKnownLocation.getLatitude());
+                                sendPostViewModel.updateLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
                             } else {
                                 Log.d(TAG, "lastKnownLocation: " + lastKnownLocation);
                             }
@@ -129,7 +230,7 @@ public class SendPostActivity extends AppCompatActivity {
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
@@ -139,5 +240,28 @@ public class SendPostActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy: ");
+    }
+
+    private TextWatcher getLocationTextWatcher() {
+        TextWatcher afterTextChangedListener = new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                sendPostViewModel.locationDataChanged(textPostLat.getText().toString(),
+                        textPostLon.getText().toString());
+            }
+        };
+
+        return afterTextChangedListener;
     }
 }
