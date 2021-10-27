@@ -1,6 +1,7 @@
 package com.comp90018.proj2.ui.sendPost;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,9 +13,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,8 +30,11 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySendPostBinding;
 import com.comp90018.proj2.ui.login.LoginFormState;
+import com.comp90018.proj2.ui.photo.GlideEngine;
+import com.comp90018.proj2.ui.photo.PhotoActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -37,9 +47,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.huantansheng.easyphotos.EasyPhotos;
+import com.huantansheng.easyphotos.callback.SelectCallback;
+import com.huantansheng.easyphotos.models.album.entity.Photo;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +66,25 @@ public class SendPostActivity extends AppCompatActivity {
     private SendPostViewModel sendPostViewModel;
     private ActivitySendPostBinding binding;
 
+
+    /**
+     * photos
+     */
+    private final ArrayList<Photo> selectedPhotoList = new ArrayList<>();
+
+    /**
+     * Adview for picture list and album item list
+     */
+    private RelativeLayout photosAdView, albumItemsAdView;
+
+    /**
+     * Adview is loaded over or not
+     */
+    private final boolean photosAdLoaded = false;
+    private final boolean albumItemsAdLoaded = false;
+
     // Fields
+    ImageButton newImageButton;
     EditText textPostLat;
     EditText textPostLon;
     EditText textPostType;
@@ -78,6 +111,20 @@ public class SendPostActivity extends AppCompatActivity {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    ActivityResultLauncher<Intent> launcher
+            = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Log.i(TAG, "uri: " + result.getData());
+//                    if (result.getData() != null && result.getResultCode() == Activity.RESULT_OK) {
+//                        Log.i(TAG, "uri: " + result.getData());
+//                    } else {
+////                    Toast.makeText(getApplicationContext(), R.string.empty_not_saved, Toast.LENGTH_LONG).show();
+//                    }
+                }
+            });
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -100,7 +147,7 @@ public class SendPostActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate: ");
 
-
+        newImageButton = binding.buttonNewImage;
         textPostLat = binding.textPostLat;
         textPostLon = binding.textPostLon;
         textPostType = binding.textPostType;
@@ -143,6 +190,35 @@ public class SendPostActivity extends AppCompatActivity {
 
             loadingProgressBar.setVisibility(View.INVISIBLE);
         });
+
+        newImageButton.setOnClickListener(v -> {
+            Log.i(TAG, "onClick: newImageButton");
+
+            // [START select image]
+            selectImage();
+            // [END select image]
+        });
+    }
+
+    private void selectImage() {
+//        Intent intent = new Intent(SendPostActivity.this, PhotoActivity.class);
+        EasyPhotos.createAlbum(SendPostActivity.this, true, false, GlideEngine.getInstance())
+                .setFileProviderAuthority("com.comp90018.proj2.ui.photo.fileprovider")
+                .start(new SelectCallback() {
+                    @Override
+                    public void onResult(ArrayList<Photo> photos, boolean isOriginal) {
+                        File file = new File(photos.get(0).path);
+                        Log.i(TAG, "selectCallBack: " + file.getAbsolutePath());
+//                        setResult(RESULT_OK, new Intent().putExtra("abc", file.getAbsolutePath()));
+//                        finish();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
+//        startActivity(intent);
     }
 
     /**
@@ -235,6 +311,20 @@ public class SendPostActivity extends AppCompatActivity {
         }
     }
     // [END maps_current_place_get_device_location]
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "onPause: ");
+    }
 
     @Override
     protected void onDestroy() {

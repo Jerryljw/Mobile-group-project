@@ -61,6 +61,13 @@ public class FindFragment extends Fragment {
         return root;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

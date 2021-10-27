@@ -3,6 +3,7 @@ package com.comp90018.proj2.ui.map;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,8 +32,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.FragmentMapBinding;
-import com.comp90018.proj2.ui.login.LoginActivity;
+import com.comp90018.proj2.ui.sendPost.MiddleActivity;
 import com.comp90018.proj2.ui.sendPost.SendPostActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -41,6 +44,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
@@ -53,7 +58,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 
-public class MapFragment extends Fragment implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener{
+public class MapFragment extends Fragment implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private String TAG = "Map Page";
 
@@ -65,8 +70,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     private GoogleMap map;
     private MapView mapView;
 
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
     private int REQUEST_CODE_PERMISSIONS = 1001;
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
+
+
+    private boolean locationPermissionGranted = false;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private Location lastKnownLocation;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -100,7 +112,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
             Log.d(TAG, "bCaptureImage Click:");
 
             Intent intent = new Intent();
-            intent.setClass(getActivity(), SendPostActivity.class);
+            intent.setClass(getActivity(), MiddleActivity.class);
+
+//            intent.setClass(getActivity(), SendPostActivity.class);
             startActivity(intent);
         });
 
