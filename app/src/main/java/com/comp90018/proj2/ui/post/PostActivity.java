@@ -18,7 +18,7 @@ public class PostActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        int postId = bundle.getInt("postId");
+        String postId = bundle.getString("postId");
 
         // post id传递
         Log.e("post", String.valueOf(postId));
