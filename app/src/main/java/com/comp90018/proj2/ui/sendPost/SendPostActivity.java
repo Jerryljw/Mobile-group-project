@@ -1,13 +1,10 @@
 package com.comp90018.proj2.ui.sendPost;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,26 +17,17 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySendPostBinding;
-import com.comp90018.proj2.ui.login.LoginFormState;
 import com.comp90018.proj2.ui.photo.GlideEngine;
-import com.comp90018.proj2.ui.photo.PhotoActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,12 +43,8 @@ import com.google.firebase.storage.UploadTask;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
-import com.huantansheng.easyphotos.utils.String.StringUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -70,28 +54,23 @@ import java.util.UUID;
 
 public class SendPostActivity extends AppCompatActivity {
 
-    // Initialize
-    private String TAG = "SendPostActivity";
-    private SendPostViewModel sendPostViewModel;
-    private ActivitySendPostBinding binding;
-
-
+    /**
+     * Request code for location permission request.
+     *
+     * @see #onRequestPermissionsResult(int, String[], int[])
+     */
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     /**
      * photos
      */
     private final ArrayList<Photo> selectedPhotoList = new ArrayList<>();
-
-    /**
-     * Adview for picture list and album item list
-     */
-    private RelativeLayout photosAdView, albumItemsAdView;
-
     /**
      * Adview is loaded over or not
      */
     private final boolean photosAdLoaded = false;
     private final boolean albumItemsAdLoaded = false;
-
+    private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
     // Fields
     ImageButton newImageButton;
     EditText textPostLat;
@@ -100,28 +79,25 @@ public class SendPostActivity extends AppCompatActivity {
     EditText textPostSpecies;
     Button sendPostButton;
     ProgressBar loadingProgressBar;
-
-    private String currentFilePath;
-
+    // Initialize
+    private final String TAG = "SendPostActivity";
+    private SendPostViewModel sendPostViewModel;
+    private ActivitySendPostBinding binding;
     /**
-     * Request code for location permission request.
-     *
-     * @see #onRequestPermissionsResult(int, String[], int[])
+     * Adview for picture list and album item list
      */
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+    private RelativeLayout photosAdView, albumItemsAdView;
+    private String currentFilePath;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location lastKnownLocation;
     private boolean locationPermissionGranted = false;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-
     /**
      * Auth
      */
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference storageRef = storage.getReference();
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private final StorageReference storageRef = storage.getReference();
 
 
     @Override
@@ -240,7 +216,7 @@ public class SendPostActivity extends AppCompatActivity {
         Log.i(TAG, "bSendPostButton: clicked");
 
         // Read image
-        String[] filename =  currentFilePath.split("\\.");
+        String[] filename = currentFilePath.split("\\.");
         BitmapFactory.Options opts = new BitmapFactory.Options();
         Bitmap bm = BitmapFactory.decodeFile(currentFilePath, opts);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
