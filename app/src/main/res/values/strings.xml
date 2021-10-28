@@ -28,8 +28,11 @@
     <string name="prompt_post_lat">Latitude</string>
     <string name="action_send_post">Send Post</string>
 
-    <string name="invalid_latitude">Not a valid latitude</string>
-    <string name="invalid_longitude">Not a valid longitude</string>
+    <string name="invalid_latitude">Not a valid latitude.</string>
+    <string name="invalid_longitude">Not a valid longitude.</string>
+    <string name="invalid_post_image">Please choose a image.</string>
+
+    <string name="error_upload_image">Error happened when uploading image. Please try again.</string>
 
 
 

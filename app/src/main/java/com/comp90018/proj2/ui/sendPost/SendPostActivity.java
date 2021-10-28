@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -47,17 +49,24 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
+import com.huantansheng.easyphotos.utils.String.StringUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class SendPostActivity extends AppCompatActivity {
 
@@ -92,6 +101,7 @@ public class SendPostActivity extends AppCompatActivity {
     Button sendPostButton;
     ProgressBar loadingProgressBar;
 
+    private String currentFilePath;
 
     /**
      * Request code for location permission request.
@@ -109,21 +119,10 @@ public class SendPostActivity extends AppCompatActivity {
      * Auth
      */
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef = storage.getReference();
 
-    ActivityResultLauncher<Intent> launcher
-            = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    Log.i(TAG, "uri: " + result.getData());
-//                    if (result.getData() != null && result.getResultCode() == Activity.RESULT_OK) {
-//                        Log.i(TAG, "uri: " + result.getData());
-//                    } else {
-////                    Toast.makeText(getApplicationContext(), R.string.empty_not_saved, Toast.LENGTH_LONG).show();
-//                    }
-                }
-            });
 
     @Override
     protected void onStart() {
@@ -184,6 +183,12 @@ public class SendPostActivity extends AppCompatActivity {
             Log.i(TAG, "onClick: ");
             loadingProgressBar.setVisibility(View.VISIBLE);
 
+            // Check image selected.
+            if (currentFilePath == null || "".equals(currentFilePath)) {
+                sendPostViewModel.getSendPostFormState().setValue(
+                        new SendPostFormState(R.string.invalid_post_image));
+                return;
+            }
             // [START send post]
             post();
             // [END send post]
@@ -207,10 +212,14 @@ public class SendPostActivity extends AppCompatActivity {
                 .start(new SelectCallback() {
                     @Override
                     public void onResult(ArrayList<Photo> photos, boolean isOriginal) {
-                        File file = new File(photos.get(0).path);
-                        Log.i(TAG, "selectCallBack: " + file.getAbsolutePath());
-//                        setResult(RESULT_OK, new Intent().putExtra("abc", file.getAbsolutePath()));
-//                        finish();
+                        currentFilePath = photos.get(0).path;
+                        Log.i(TAG, "selectCallBack: " + currentFilePath);
+
+                        BitmapFactory.Options opts = new BitmapFactory.Options();
+                        opts.inJustDecodeBounds = false;
+                        opts.inSampleSize = 3;
+                        Bitmap bm = BitmapFactory.decodeFile(currentFilePath, opts);
+                        newImageButton.setImageBitmap(bm);
                     }
 
                     @Override
@@ -225,11 +234,48 @@ public class SendPostActivity extends AppCompatActivity {
      * Send Post to the Firestore
      */
     private void post() {
+        // [START send post to firebase]
+        loadingProgressBar.setVisibility(View.VISIBLE);
+
         Log.i(TAG, "bSendPostButton: clicked");
 
+        // Read image
+        String[] filename =  currentFilePath.split("\\.");
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        Bitmap bm = BitmapFactory.decodeFile(currentFilePath, opts);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        // Upload image
+        String uuid = UUID.randomUUID().toString() + "-" + Calendar.getInstance().getTimeInMillis();
+        StorageReference uploadRef = storageRef.child("images/" + uuid + "." + filename[filename.length - 1]);
+        UploadTask uploadTask = uploadRef.putBytes(data);
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                if (taskSnapshot.getMetadata() != null) {
+                    Log.i(TAG, taskSnapshot.getMetadata().getPath());
+                    sendPost2Firestore(taskSnapshot.getMetadata().getPath());
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
+            }
+        });
+        loadingProgressBar.setVisibility(View.INVISIBLE);
+        // [END send post to firebase]
+    }
+
+    private void sendPost2Firestore(String imagePath) {
         // Test
         Map<String, Object> user = new HashMap<>();
-        user.put("PostImage", "PostImage");
+        user.put("PostImage", imagePath);
         user.put("PostLocation", new GeoPoint(Double.parseDouble(textPostLat.getText().toString()),
                 Double.parseDouble(textPostLon.getText().toString())));
         user.put("PostSpecies", textPostSpecies.getText().toString());

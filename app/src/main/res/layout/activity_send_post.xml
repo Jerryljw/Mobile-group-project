@@ -18,7 +18,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_add" />
+        app:srcCompat="@android:drawable/ic_menu_add"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <EditText
         android:id="@+id/text_post_type"
@@ -32,6 +33,7 @@
         android:imeActionLabel="@string/action_sign_in_short"
         android:imeOptions="actionDone"
         android:inputType="text"
+        android:minHeight="48dp"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -51,6 +53,7 @@
         android:imeActionLabel="@string/action_sign_in_short"
         android:imeOptions="actionDone"
         android:inputType="text"
+        android:minHeight="48dp"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -87,8 +90,8 @@
 
     <EditText
         android:id="@+id/text_post_lon"
-        android:layout_width="100dp"
-        android:layout_height="42dp"
+        android:layout_width="140dp"
+        android:layout_height="48dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:imeOptions="actionDone"
@@ -113,8 +116,8 @@
 
     <EditText
         android:id="@+id/text_post_lat"
-        android:layout_width="100dp"
-        android:layout_height="42dp"
+        android:layout_width="140dp"
+        android:layout_height="48dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:imeOptions="actionDone"

@@ -5,10 +5,17 @@ import androidx.annotation.Nullable;
 public class SendPostFormState {
 
     @Nullable
+    private Integer imageError;
+    @Nullable
     private Integer longitudeError;
     @Nullable
     private Integer latitudeError;
     private boolean isDataValid = true;
+
+    SendPostFormState(@Nullable Integer imageError) {
+        this.imageError = imageError;
+        this.isDataValid = false;
+    }
 
     SendPostFormState(@Nullable Integer longitudeError, @Nullable Integer latitudeError) {
         this.longitudeError = longitudeError;
@@ -20,6 +27,15 @@ public class SendPostFormState {
         this.longitudeError = null;
         this.latitudeError = null;
         this.isDataValid = isDataValid;
+    }
+
+    @Nullable
+    public Integer getImageError() {
+        return imageError;
+    }
+
+    public void setImageError(@Nullable Integer imageError) {
+        this.imageError = imageError;
     }
 
     @Nullable
