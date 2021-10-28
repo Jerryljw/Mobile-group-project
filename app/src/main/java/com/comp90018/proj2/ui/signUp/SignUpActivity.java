@@ -151,7 +151,6 @@ public class SignUpActivity extends AppCompatActivity {
 
             // [START sign up]
             signUp();
-
             // [END sign up]
 
             loadingProgressBar.setVisibility(View.INVISIBLE);
@@ -235,7 +234,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                 }
                                             }
                                         });
-
+                                finish();
                             }
                         } else {
                             // If sign in fails, display a message to the user.
