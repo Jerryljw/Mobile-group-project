@@ -1,25 +1,42 @@
-package com.comp90018.proj2.ui.finder;
+package com.comp90018.proj2.data.model;
+
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.GeoPoint;
+
+import java.util.Date;
 
 public class CardItem {
 
     // TODO: userid contains all
-    private int userId;
-    private int postId;
+    private String userId;
+    private String postId;
 
     private int img;
     private String titles;
     private int headsIcon;
     private String usernames;
-    private String distance;
+    private Timestamp postTime;
 
     // set a default value which is unsolved
     private int postType = 0;
 
-    public int getPostId() {
+    // TODO: need to read from db as Coordinates to do calculate or??
+    private GeoPoint point;
+
+    public Timestamp getPostTime() {
+        return postTime;
+    }
+
+    public void setPostTime(Timestamp postTime) {
+        this.postTime = postTime;
+    }
+
+
+    public String getPostId() {
         return postId;
     }
 
-    public void setPostId(int postId) {
+    public void setPostId(String postId) {
         this.postId = postId;
     }
 
@@ -31,20 +48,20 @@ public class CardItem {
         this.postType = postType;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public String getDistance() {
-        return distance;
+    public GeoPoint getPoint() {
+        return point;
     }
 
-    public void setDistance(String distance) {
-        this.distance = distance;
+    public void setPoint(GeoPoint point) {
+        this.point = point;
     }
 
     public int getImg() {
@@ -78,5 +95,6 @@ public class CardItem {
     public void setUsernames(String usernames) {
         this.usernames = usernames;
     }
-}
 
+
+}
