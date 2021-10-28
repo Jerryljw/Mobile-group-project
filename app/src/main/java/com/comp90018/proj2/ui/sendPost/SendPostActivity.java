@@ -288,13 +288,16 @@ public class SendPostActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        Log.i(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        Toast.makeText(getApplicationContext(), R.string.success_send_post, Toast.LENGTH_LONG).show();
+                        finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
+                        Log.i(TAG, "Error adding document", e);
+                        Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
                     }
                 });
     }

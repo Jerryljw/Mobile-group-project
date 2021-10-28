@@ -12,7 +12,7 @@
         android:id="@+id/button_newImage"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintLeft_toLeftOf="parent"

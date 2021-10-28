@@ -33,6 +33,7 @@
     <string name="invalid_post_image">Please choose a image.</string>
 
     <string name="error_upload_image">Error happened when uploading image. Please try again.</string>
+    <string name="success_send_post">Your post has been received!</string>
 
 
 
