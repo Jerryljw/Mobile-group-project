@@ -45,7 +45,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.tv_name.setText(commentData.get(position).getUname());
         holder.tv_content.setText(commentData.get(position).getContent());
         Log.d("TAG", "setTimestamp: "+ commentData.get(position).getTimestamp().toString());
-        holder.tv_date.setText(commentData.get(position).getTimestamp().toString());
+        holder.tv_date.setText(timestampToString((long)commentData.get(position).getTimestamp().getSeconds()));
     }
 
     @Override

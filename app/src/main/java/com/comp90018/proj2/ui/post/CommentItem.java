@@ -8,7 +8,7 @@ import com.google.firebase.Timestamp;
 public class CommentItem {
 
     private String content,uid,uimg,uname;
-    private Object timestamp;
+    private Timestamp timestamp;
 
 
     public CommentItem() {
@@ -22,7 +22,7 @@ public class CommentItem {
         this.timestamp = Timestamp.now();
     }
 
-    public CommentItem(String content, String uid, String uimg, String uname, Object timestamp) {
+    public CommentItem(String content, String uid, String uimg, String uname, Timestamp timestamp) {
         this.content = content;
         this.uid = uid;
         this.uimg = uimg;
@@ -62,11 +62,11 @@ public class CommentItem {
         this.uname = uname;
     }
 
-    public Object getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Object timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 }

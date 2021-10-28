@@ -38,8 +38,8 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="303dp"
+            android:layout_height="match_parent"
             android:layout_weight="3.0">
             <!--username-->
             <ImageView
@@ -60,20 +60,16 @@
                 android:text="XXX"
                 android:textColor="#333333"
                 android:textSize="15sp" />
+
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0">
-            <!--username-->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="25dp"
-                android:text="Look Around.."
-                android:textColor="#333333"
-                android:textSize="15sp" />
-        </LinearLayout>
+        <Button
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginLeft="10dp"
+            android:text="Location"
+            android:textSize="15sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -126,49 +122,37 @@
                 android:orientation="horizontal">
 
                 <!-- Check Location Button-->
-                <Button
-                    android:id="@+id/imageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:layout_marginLeft="10dp"
-                    android:text="Location"
-                    android:textSize="15sp" />
 
                 <!-- thumb up, comments and subscribe-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="right"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <!-- thumb up -->
-                    <ImageView
-                        android:id="@+id/post_up"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginTop="20dp"
-
-                        android:layout_marginRight="5dp"
-                        android:src="@drawable/ic_post_up" />
 
                     <!-- comments -->
-                    <ImageView
-                        android:id="@+id/post_comments"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginRight="20dp"
-                        android:src="@drawable/ic_post_comment" />
+
+                    <TextView
+                        android:id="@+id/post_title_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="title" />
+
+                    <TextView
+                        android:id="@+id/post_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_weight="1"
+                        android:text="post text" />
 
                 </LinearLayout>
 
             </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginTop="5dp"
-                android:background="#333333" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -189,7 +173,7 @@
                 <EditText
                     android:id="@+id/comment_edit_multiline_text"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:ems="10"
                     android:gravity="start|top"
