@@ -4,11 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,31 +14,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.Camera;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.view.PreviewView;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.FragmentMapBinding;
-import com.comp90018.proj2.ui.login.LoginActivity;
 import com.comp90018.proj2.ui.post.PostActivity;
 import com.comp90018.proj2.ui.sendPost.SendPostActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -50,20 +35,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 
 public class MapFragment extends Fragment
@@ -88,8 +63,6 @@ public class MapFragment extends Fragment
     // not granted.
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean locationPermissionGranted;
 
     /**
      * Flag indicating whether a requested permission has been denied after returning in
@@ -109,8 +82,6 @@ public class MapFragment extends Fragment
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private int REQUEST_CODE_PERMISSIONS = 1001;
-    private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
 
     /**
      * Request code for location permission request.
@@ -136,14 +107,14 @@ public class MapFragment extends Fragment
         mapFragment.getMapAsync(this);
 
 
-        // Text
-        final TextView textView = binding.textMap;
-        mapViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+//        // Text
+//        final TextView textView = binding.textMap;
+//        mapViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
 
         // Camera Button
         bCaptureImage = binding.cameraCaptureButton;
@@ -167,7 +138,10 @@ public class MapFragment extends Fragment
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Toast.makeText(getContext(), "Go to New Post Activity", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), SendPostActivity.class);
+
+        startActivity(intent);
         return super.onOptionsItemSelected(item);
     }
 
@@ -210,7 +184,8 @@ public class MapFragment extends Fragment
         map = googleMap;
         map.setOnInfoWindowClickListener(this);
         map.setOnMyLocationButtonClickListener(this);
-        map.setOnMarkerClickListener(this);
+//        map.setOnMarkerClickListener(this);
+        map.setInfoWindowAdapter(new PostInfoWindowAdapter(getContext()));
         enableMyLocation();
 
         // Add a marker in Sydney and move the camera
@@ -241,8 +216,9 @@ public class MapFragment extends Fragment
     public boolean onMarkerClick(@NonNull Marker marker) {
         Intent intent = new Intent(getActivity(), PostActivity.class);
         Bundle bundle = new Bundle();
-        Log.e(TAG, marker.getTag().toString());
-        bundle.putString("postId", marker.getTag().toString());
+        String postId = (String) marker.getTag();
+        Log.e(TAG, postId);
+        bundle.putString("postId", postId);
         intent.putExtras(bundle);
         startActivity(intent);
         return false;

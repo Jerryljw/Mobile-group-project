@@ -31,4 +31,6 @@ public class PostActivity extends AppCompatActivity {
         intent.setClass(PostActivity.this, MainActivity.class);
         PostActivity.this.startActivity(intent);
     }
+
+
 }

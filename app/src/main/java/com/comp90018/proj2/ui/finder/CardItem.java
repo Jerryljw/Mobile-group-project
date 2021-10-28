@@ -11,9 +11,19 @@ public class CardItem {
     private int headsIcon;
     private String usernames;
     private String distance;
+    private String imgUrl;
 
     // set a default value which is unsolved
     private int postType = 0;
+
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
     public int getPostId() {
         return postId;
@@ -77,6 +87,21 @@ public class CardItem {
 
     public void setUsernames(String usernames) {
         this.usernames = usernames;
+    }
+
+    @Override
+    public String toString() {
+        return "CardItem{" +
+                "userId=" + userId +
+                ", postId=" + postId +
+                ", img=" + img +
+                ", titles='" + titles + '\'' +
+                ", headsIcon=" + headsIcon +
+                ", usernames='" + usernames + '\'' +
+                ", distance='" + distance + '\'' +
+                ", imgUrl='" + imgUrl + '\'' +
+                ", postType=" + postType +
+                '}';
     }
 }
 
