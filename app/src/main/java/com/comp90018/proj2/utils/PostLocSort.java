@@ -1,7 +1,6 @@
 package com.comp90018.proj2.utils;
 
-
-import static com.comp90018.proj2.ui.finder.AnimalFinderFragment.caldistance;
+import static com.comp90018.proj2.MainActivity.caldistance;
 
 import com.comp90018.proj2.data.model.CardItem;
 import com.google.firebase.firestore.GeoPoint;

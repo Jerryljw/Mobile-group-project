@@ -1,6 +1,8 @@
 package com.comp90018.proj2.ui.finder;
 
 
+import static com.comp90018.proj2.MainActivity.caldistance;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.data.model.CardItem;
 import com.comp90018.proj2.ui.post.PostActivity;
+import com.comp90018.proj2.utils.LocationCommunication;
 import com.comp90018.proj2.utils.PostLocSort;
 import com.comp90018.proj2.utils.PostTimeSort;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,9 +39,9 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 
 public class AnimalFinderFragment extends Fragment {
 
@@ -48,8 +51,10 @@ public class AnimalFinderFragment extends Fragment {
     private RecyclerView recyclerView;
     private HomeAdapter homeAdapter;
 
+    // Upper Tab
     private Spinner spinner;
     private String sp_item;
+
     private static final String TAG = "Extract";
 
     // read data from firebase
@@ -57,28 +62,44 @@ public class AnimalFinderFragment extends Fragment {
     private CollectionReference firestore_reference = firestore_db.
             collection("Post_Temp");
 
+    private GeoPoint current;
+
     // get the user current location
-    GeoPoint current = new GeoPoint(34.002, 151.001);
+    LocationCommunication mLocationCallback;
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mLocationCallback = (LocationCommunication) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement DataCommunication");
+        }
+        current = mLocationCallback.getLocation();
+        // Log.e("Animal Current onAttach", String.valueOf(current));
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //这个修改为对应子Fragment和父Fragment的布局文件
         view=inflater.inflate(R.layout.fragment_finder_animal,container,false);
 
-        // show data
-        initRecycleView();
+        // load layout and show the data from firebase
         loadCardItemFromFirebase();
 
-        // sorting list
+        // sorting list button
         spinner = (Spinner) view.findViewById(R.id.animal_sp);
         sp_item = (String) spinner.getSelectedItem();
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
                 sp_item = (String) spinner.getSelectedItem();
                 if (sp_item.equalsIgnoreCase("Latest Post Time")) {
-                    Log.e("Animal","latest");
                     PostTimeSort postTimeSort = new PostTimeSort();
                     Collections.sort(cardItemArrayList, postTimeSort);
                     initRecycleView();
@@ -104,30 +125,21 @@ public class AnimalFinderFragment extends Fragment {
     }
 
 
-
     private void initRecycleView(){
-        // Create a recyclerView object，initialize xml
         recyclerView=(RecyclerView) view.findViewById(R.id.home_item);
-
-        // create an adapter to put items
         homeAdapter = new HomeAdapter(getActivity(),cardItemArrayList,current);
 
-        // set format of view，2 cols
+        // set format of view, 2 cols
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
-
-        // add item space to recycleView
-        //recyclerView.addItemDecoration(new AnimalFinderFragment.space_item(space));
-
-        //add adapter to recyclerView
         recyclerView.setAdapter(homeAdapter);
 
-        // create click listener on adapter
+        // create click listener on adapter for passing postid to PostActivity
         homeAdapter.setOnItemClickListener(new HomeAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(View view, CardItem cardItem) {
 
                 // jump to post activity
-                // TODO: need to pass USERID to PostActivity, use !postId!
+                // TODO: need to pass postId to PostActivity
                 Intent intent = new Intent(getActivity(), PostActivity.class);
                 Bundle bundle = new Bundle();
                 Log.e(TAG, String.valueOf(cardItem.getPostId()));
@@ -137,7 +149,6 @@ public class AnimalFinderFragment extends Fragment {
             }
         });
     }
-
 
 
     /**
@@ -189,10 +200,6 @@ public class AnimalFinderFragment extends Fragment {
                                                             cardItem.setPostTime(postTime);
 
                                                             cardItemArrayList.add(cardItem);
-
-                                                            Log.d("firebase",
-                                                                    String.valueOf(cardItemArrayList.size()));
-
                                                             homeAdapter = new HomeAdapter(getActivity(),
                                                                     cardItemArrayList,current);
                                                             recyclerView.setAdapter(homeAdapter);
@@ -223,7 +230,7 @@ public class AnimalFinderFragment extends Fragment {
                                                         }
                                                     }
                                                 });
-                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                // Log.d(TAG, document.getId() + " => " + document.getData());
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -233,37 +240,12 @@ public class AnimalFinderFragment extends Fragment {
         return cardItemArrayList;
     }
 
-    static public double caldistance(GeoPoint current, GeoPoint postPoint)
-    {
-        double lon1 = Math.toRadians(current.getLongitude());
-        double lon2 = Math.toRadians(postPoint.getLongitude());
-        double lat1 = Math.toRadians(current.getLatitude());
-        double lat2 = Math.toRadians(postPoint.getLatitude());
-
-        // Haversine formula
-        double dlon = lon2 - lon1;
-        double dlat = lat2 - lat1;
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.pow(Math.sin(dlon / 2),2);
-
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        // Radius of earth in kilometers. Use 3956
-        // for miles
-        double r = 6371;
-
-        // calculate the result
-        return(c * r);
-    }
-
-
-
     // inner adapter class
     static class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MyViewHolder> {
         private Context context;
         private GeoPoint current;
         private ArrayList<CardItem> cardItemArrayList;
+        private static DecimalFormat df = new DecimalFormat("0.00");
 
         public HomeAdapter(Context context, ArrayList<CardItem> cardItemArrayList, GeoPoint current) {
             this.context = context;
@@ -291,13 +273,12 @@ public class AnimalFinderFragment extends Fragment {
             holder.title.setText(cardData.getTitles());
             holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
-            holder.distance.setText(String.valueOf(caldistance(current,cardData.getPoint())));
+            holder.distance.setText(df.format(caldistance(current,cardData.getPoint()))+" km");
 
             // 0 means unsolved
             if (cardData.getPostType()==0){
                 holder.postType.setImageResource(R.drawable.ic_finder_question);
             }else{
-
                 holder.postType.setImageResource(R.drawable.ic_finder_bingo);
             }
         }

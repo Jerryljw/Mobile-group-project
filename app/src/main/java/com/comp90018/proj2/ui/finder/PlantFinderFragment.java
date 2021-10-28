@@ -1,7 +1,6 @@
 package com.comp90018.proj2.ui.finder;
 
-import static com.comp90018.proj2.ui.finder.AnimalFinderFragment.caldistance;
-
+import static com.comp90018.proj2.MainActivity.caldistance;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.data.model.CardItem;
 import com.comp90018.proj2.ui.post.PostActivity;
+import com.comp90018.proj2.utils.LocationCommunication;
 import com.comp90018.proj2.utils.PostLocSort;
 import com.comp90018.proj2.utils.PostTimeSort;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,9 +37,9 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 
 public class PlantFinderFragment extends Fragment {
 
@@ -49,6 +49,7 @@ public class PlantFinderFragment extends Fragment {
     private RecyclerView recyclerView;
     private HomeAdapter homeAdapter;
 
+    // Upper Tab
     private Spinner spinner;
     private String sp_item;
 
@@ -59,33 +60,50 @@ public class PlantFinderFragment extends Fragment {
     private CollectionReference firestore_reference = firestore_db.
             collection("Post_Temp");
 
-    private GeoPoint current= new GeoPoint(34.002, 151.001);
+    private GeoPoint current;
+
+    // get the user current location
+    LocationCommunication mLocationCallback;
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mLocationCallback = (LocationCommunication) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement DataCommunication");
+        }
+        current = mLocationCallback.getLocation();
+        // Log.e("Animal Current onAttach", String.valueOf(current));
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.e("onCreateView", "2");
-        //这个修改为对应子Fragment和父Fragment的布局文件
+        // Log.e("onCreateView", "2");
         view = inflater.inflate(R.layout.fragment_finder_plant, container, false);
 
-        // get data
-        //initData();
-
-        // show data
-        initRecycleView();
+        // load layout and show the data from firebase
         loadCardItemFromFirebase();
 
-        // sorting list
+        // sorting list button
         spinner = (Spinner) view.findViewById(R.id.plant_sp);
         sp_item = (String) spinner.getSelectedItem();
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                // get the type of sorting
                 sp_item = (String) spinner.getSelectedItem();
                 if (sp_item.equalsIgnoreCase("Latest Post Time")) {
-                    Log.e(TAG, "latest");
                     PostTimeSort postTimeSort = new PostTimeSort();
                     Collections.sort(cardItemArrayList, postTimeSort);
+
+                    // refresh the view
                     initRecycleView();
                 } else {
                     Log.e(TAG, "Nearest");
@@ -97,7 +115,6 @@ public class PlantFinderFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -110,30 +127,24 @@ public class PlantFinderFragment extends Fragment {
     }
 
 
+    /**
+     * Initialize the view in nested fragment
+     */
     private void initRecycleView() {
-        // Create a recyclerView object，initialize xml
         recyclerView = (RecyclerView) view.findViewById(R.id.home_item);
-
-        // create an adapter to put items
         homeAdapter = new HomeAdapter(getActivity(), cardItemArrayList, current);
 
-        // set format of view，2 cols
+        // set format of view, 2 cols
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-
-        // add item space to recycleView
-        //recyclerView.addItemDecoration(new PlantFinderFragment.space_item(space));
-
-        //add adapter to recyclerView
         recyclerView.setAdapter(homeAdapter);
 
-        // create click listener on adapter
+        // create click listener on adapter for passing postid to PostActivity
         homeAdapter.setOnItemClickListener(new HomeAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(View view, CardItem cardItem) {
-//                Toast.makeText(getActivity(),"我是item",Toast.LENGTH_SHORT).show();
 
                 // jump to post activity
-                // TODO: need to pass USERID to PostActivity, use !postId!
+                // TODO: need to pass postId to PostActivity
                 Intent intent = new Intent(getActivity(), PostActivity.class);
                 Bundle bundle = new Bundle();
                 Log.e(TAG, String.valueOf(cardItem.getPostId()));
@@ -142,7 +153,6 @@ public class PlantFinderFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
     }
 
 
@@ -158,6 +168,8 @@ public class PlantFinderFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+
+                            // go through all the documents in collection
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 firestore_reference.document(document.getId())
                                         .get()
@@ -178,14 +190,13 @@ public class PlantFinderFragment extends Fragment {
                                                                     .getString("UserId");
                                                             GeoPoint postGeoPoint = documentSnapshot
                                                                     .getGeoPoint("PostLocation");
-                                                            Log.e("Location", String.valueOf(postGeoPoint));
+                                                            // Log.e("Location", String.valueOf(postGeoPoint));
                                                             String postImg = documentSnapshot
                                                                     .getString("PostImage");
                                                             String postTitle = documentSnapshot
                                                                     .getString("PostTitle");
                                                             String postId = documentSnapshot
                                                                     .getString("PostId");
-
 
                                                             // set data
                                                             CardItem cardItem = new CardItem();
@@ -194,21 +205,17 @@ public class PlantFinderFragment extends Fragment {
                                                             cardItem.setTitles(postTitle);
                                                             cardItem.setUsernames("test");
                                                             cardItem.setPoint(postGeoPoint);
-
                                                             cardItem.setPostTime(postTime);
-                                                            Log.e("getLocation", String.valueOf(cardItem.getPoint()));
                                                             cardItem.setPostId(postId);
 
                                                             cardItemArrayList.add(cardItem);
 
-                                                            Log.d("firebase",
-                                                                    String.valueOf(cardItemArrayList.size()));
-
+                                                            // refresh view
                                                             homeAdapter = new HomeAdapter(getActivity(),
                                                                     cardItemArrayList, current);
                                                             recyclerView.setAdapter(homeAdapter);
 
-                                                            // create click listener on adapter
+                                                            // create click listener on adapter again
                                                             homeAdapter.setOnItemClickListener(
                                                                     new HomeAdapter.OnItemClickListener() {
                                                                         @Override
@@ -216,7 +223,6 @@ public class PlantFinderFragment extends Fragment {
                                                                                                 CardItem cardItem) {
 
                                                                             // jump to post activity
-                                                                            // TODO: need to pass carditem to PostActivity
                                                                             Intent intent = new Intent(getActivity(), PostActivity.class);
                                                                             Bundle bundle = new Bundle();
                                                                             Log.e("click", String.valueOf(cardItem.getPostId()));
@@ -234,7 +240,7 @@ public class PlantFinderFragment extends Fragment {
                                                         }
                                                     }
                                                 });
-                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                // Log.d(TAG, document.getId() + " => " + document.getData());
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -249,7 +255,14 @@ public class PlantFinderFragment extends Fragment {
     static class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MyViewHolder> {
         private Context context;
         private ArrayList<CardItem> cardItemArrayList;
+
+        // for click card item
+        private OnItemClickListener onItemClickListener;
+
+
+        // show current location and format to 2 decimal places
         private GeoPoint current;
+        private static DecimalFormat df = new DecimalFormat("0.00");
 
         public HomeAdapter(Context context, ArrayList<CardItem> cardItemArrayList, GeoPoint current) {
             this.context = context;
@@ -257,9 +270,14 @@ public class PlantFinderFragment extends Fragment {
             this.current = current;
         }
 
+        /**
+         * loading layout, and return MyViewHolder object
+         * @param parent parent view
+         * @param viewType view type
+         * @return a view holder
+         */
         @NonNull
         @Override
-        // loading layout, and return MyViewHolder object
         public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             // Create view object
             View view = LayoutInflater.from(context).inflate(R.layout.carditem, parent, false);
@@ -270,20 +288,18 @@ public class PlantFinderFragment extends Fragment {
         }
 
         @Override
-        // get data and showing
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             CardItem cardData = cardItemArrayList.get(position);
             holder.img.setImageResource(cardData.getImg());
             holder.title.setText(cardData.getTitles());
             holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
-            holder.distance.setText(String.valueOf(caldistance(current, cardData.getPoint())));
+            holder.distance.setText(df.format(caldistance(current,cardData.getPoint()))+" km");
 
             // 0 means unsolved
             if (cardData.getPostType() == 0) {
                 holder.postType.setImageResource(R.drawable.ic_finder_question);
             } else {
-
                 holder.postType.setImageResource(R.drawable.ic_finder_bingo);
             }
         }
@@ -326,8 +342,6 @@ public class PlantFinderFragment extends Fragment {
         public interface OnItemClickListener {
             void OnItemClick(View view, CardItem cardItem);
         }
-
-        private OnItemClickListener onItemClickListener;
 
         public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
             this.onItemClickListener = onItemClickListener;
