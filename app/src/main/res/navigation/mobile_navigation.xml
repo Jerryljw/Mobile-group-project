@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.comp90018.proj2.ui.find.FindFragment"
+        android:name="com.comp90018.proj2.ui.finder.FinderFragment"
         android:label="@string/title_find"
         tools:layout="@layout/fragment_find" />
 

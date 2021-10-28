@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.FragmentMapBinding;
+import com.comp90018.proj2.ui.post.PostActivity;
 import com.comp90018.proj2.ui.sendPost.SendPostActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,7 +50,8 @@ public class MapFragment extends Fragment
         View.OnClickListener,
         OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMyLocationButtonClickListener {
+        GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMarkerClickListener {
 
     private String TAG = "MapFrag";
 
@@ -165,7 +167,8 @@ public class MapFragment extends Fragment
                                 GeoPoint postLocation = (GeoPoint) document.getData().get("PostLocation");
                                 if (postLocation != null) {
                                     LatLng latLng = new LatLng(postLocation.getLatitude(), postLocation.getLongitude());
-                                    map.addMarker(new MarkerOptions().position(latLng).title("Post Marker"));
+                                    map.addMarker(new MarkerOptions().position(latLng).
+                                            title("Post Marker")).setTag(document.getId());
                                 }
 
                             }
@@ -191,12 +194,13 @@ public class MapFragment extends Fragment
         map = googleMap;
         map.setOnInfoWindowClickListener(this);
         map.setOnMyLocationButtonClickListener(this);
+        map.setOnMarkerClickListener(this);
         enableMyLocation();
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
 
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 14f));
 
         View mapView = mapFragment.getView();
@@ -214,6 +218,17 @@ public class MapFragment extends Fragment
         Toast.makeText(getContext(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
+        return false;
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        Intent intent = new Intent(getActivity(), PostActivity.class);
+        Bundle bundle = new Bundle();
+        Log.e(TAG, marker.getTag().toString());
+        bundle.putString("postId", marker.getTag().toString());
+        intent.putExtras(bundle);
+        startActivity(intent);
         return false;
     }
 
@@ -328,5 +343,4 @@ public class MapFragment extends Fragment
         switch (view.getId()) {
         }
     }
-
 }
