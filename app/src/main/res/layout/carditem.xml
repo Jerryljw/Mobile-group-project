@@ -5,12 +5,17 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:onClick="card_onclick"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginLeft="12dp"
+    android:layout_marginRight="12dp">
+
+    <!--Title with maximum 2 lines-->
+
     <ImageView
         android:id="@+id/home_item_img"
-        android:layout_width="200dp"
-        android:layout_height="200dp" />
-    <!--Title with maximum 2 lines-->
+        android:layout_width="185dp"
+        android:layout_height="185dp" />
+
     <TextView
         android:id="@+id/home_item_title"
         android:layout_width="match_parent"

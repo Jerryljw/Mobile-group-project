@@ -22,9 +22,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.data.model.CardItem;
 import com.comp90018.proj2.ui.post.PostActivity;
+import com.comp90018.proj2.utils.GlideApp;
 import com.comp90018.proj2.utils.LocationCommunication;
 import com.comp90018.proj2.utils.PostLocSort;
 import com.comp90018.proj2.utils.PostTimeSort;
@@ -38,6 +40,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.type.DateTime;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -59,8 +64,11 @@ public class AnimalFinderFragment extends Fragment {
 
     // read data from firebase
     private FirebaseFirestore firestore_db = FirebaseFirestore.getInstance();
+
     private CollectionReference firestore_reference = firestore_db.
             collection("Post_Temp");
+
+    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     private GeoPoint current;
 
@@ -70,7 +78,6 @@ public class AnimalFinderFragment extends Fragment {
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
@@ -191,13 +198,14 @@ public class AnimalFinderFragment extends Fragment {
 
                                                             // set data
                                                             CardItem cardItem = new CardItem();
-                                                            cardItem.setImg(R.drawable.ic_card_image);
+                                                            cardItem.setImg(storage.getReferenceFromUrl(postImg));
                                                             cardItem.setHeadsIcon(R.drawable.ic_card_portrait);
                                                             cardItem.setTitles(postTitle);
                                                             cardItem.setUsernames("test");
                                                             cardItem.setPoint(postGeoPoint);
                                                             cardItem.setPostId(postId);
                                                             cardItem.setPostTime(postTime);
+
 
                                                             cardItemArrayList.add(cardItem);
                                                             homeAdapter = new HomeAdapter(getActivity(),
@@ -245,7 +253,7 @@ public class AnimalFinderFragment extends Fragment {
         private Context context;
         private GeoPoint current;
         private ArrayList<CardItem> cardItemArrayList;
-        private static DecimalFormat df = new DecimalFormat("0.00");
+        private DecimalFormat df = new DecimalFormat("0.00");
 
         public HomeAdapter(Context context, ArrayList<CardItem> cardItemArrayList, GeoPoint current) {
             this.context = context;
@@ -269,11 +277,17 @@ public class AnimalFinderFragment extends Fragment {
         // get data and showing
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             CardItem cardData = cardItemArrayList.get(position);
-            holder.img.setImageResource(cardData.getImg());
+            //holder.img.setImageResource(cardData.getImg());
             holder.title.setText(cardData.getTitles());
             holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
             holder.distance.setText(df.format(caldistance(current,cardData.getPoint()))+" km");
+            GlideApp
+                    .with(context)
+                    .load(cardData.getImg())
+                    .centerCrop()
+                    .into(holder.img);
+            Log.e("Loading", String.valueOf(cardData.getImg()));
 
             // 0 means unsolved
             if (cardData.getPostType()==0){

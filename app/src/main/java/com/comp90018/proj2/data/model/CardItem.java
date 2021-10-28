@@ -2,8 +2,7 @@ package com.comp90018.proj2.data.model;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
-
-import java.util.Date;
+import com.google.firebase.storage.StorageReference;
 
 public class CardItem {
 
@@ -11,7 +10,7 @@ public class CardItem {
     private String userId;
     private String postId;
 
-    private int img;
+    private StorageReference img;
     private String titles;
     private int headsIcon;
     private String usernames;
@@ -64,11 +63,11 @@ public class CardItem {
         this.point = point;
     }
 
-    public int getImg() {
+    public StorageReference getImg() {
         return img;
     }
 
-    public void setImg(int img) {
+    public void setImg(StorageReference img) {
         this.img = img;
     }
 
