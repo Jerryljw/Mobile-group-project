@@ -6,17 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".ui.map.MapFragment">
 
-<!--    <fragment-->
-<!--        android:id="@+id/map_frag"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        tools:context=".MapsActivity"-->
-<!--        android:name="com.google.android.gms.maps.SupportMapFragment" />-->
-
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/map_view"
+    <fragment
+        android:id="@+id/map_frag"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:context=".MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
 
     <TextView
         android:id="@+id/text_map"
@@ -40,7 +35,7 @@
         android:background="@drawable/ic_capture_button"
         android:elevation="2dp"
         android:scaleType="fitCenter"
-        android:text="Capture Photo"
+        android:text="@string/action_promote_send_post"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
