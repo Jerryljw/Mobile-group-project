@@ -25,6 +25,7 @@ import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySignUpBinding;
 import com.comp90018.proj2.ui.login.LoginFormState;
 import com.comp90018.proj2.ui.photo.GlideEngine;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -172,22 +173,47 @@ public class SignUpActivity extends AppCompatActivity {
         StorageReference uploadRef = storageRef.child("icons/" + uuid + "." + filename[filename.length - 1]);
         UploadTask uploadTask = uploadRef.putBytes(data);
 
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                if (taskSnapshot.getMetadata() != null) {
-                    Log.i(TAG, taskSnapshot.getMetadata().getPath());
-                    iconUri = taskSnapshot.getMetadata().getPath();
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw Objects.requireNonNull(task.getException());
+                }
+
+                // Continue with the task to get the download URL
+                return uploadRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Log.i(TAG, "Uri: " +  task.getResult());
+//                    iconUri = task.getResult().getPath();
+                    updateUserProfile(task.getResult());
                 } else {
-                    Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
+                    // Handle failures
+                    // ...
                 }
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
-            }
         });
+
+
+//        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//            @Override
+//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                if (taskSnapshot.getMetadata() != null) {
+//                    Log.i(TAG, taskSnapshot.getMetadata().getPath());
+//                    iconUri = taskSnapshot.getMetadata().getPath();
+//                } else {
+//                    Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception exception) {
+//                Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
 
     private void signUp() {
@@ -206,35 +232,18 @@ public class SignUpActivity extends AppCompatActivity {
                             if (user != null) {
                                 Log.d(TAG, "profileUpdates: start");
 
-                                if (currIconPath != null && !"".equals(currIconPath)) {
-                                    saveIcon();
-                                }
                                 Log.i(TAG, "Expected Display Name = " + tDisplayName.getText().toString());
                                 Log.i(TAG, "Expected Uri = " + iconUri);
 
+                                if (currIconPath != null && !"".equals(currIconPath)) {
+                                    saveIcon();
 
-                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                        .setDisplayName(tDisplayName.getText().toString())
-                                        .setPhotoUri(Uri.parse(iconUri != null ? iconUri :
-                                                "https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com/" +
-                                                        "o/icons%2Fvecteezypeople-business-avatarpp0421_generated.jpg?alt=media" +
-                                                        "&token=fd8edb77-c9a1-4e07-862c-8a88d0f82261"))
-                                        .build();
+                                } else {
+                                    updateUserProfile(Uri.parse("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com/" +
+                                            "o/icons%2Fvecteezypeople-business-avatarpp0421_generated.jpg?alt=media" +
+                                            "&token=fd8edb77-c9a1-4e07-862c-8a88d0f82261"));
+                                }
 
-                                user.updateProfile(profileUpdates)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Log.d(TAG, "User profile updated.");
-
-                                                    Log.i(TAG, "profileUpdates: succeed");
-                                                    Log.i(TAG, "Display Name = " + user.getDisplayName());
-                                                    Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
-                                                }
-                                            }
-                                        });
-                                finish();
                             }
                         } else {
                             // If sign in fails, display a message to the user.
@@ -246,6 +255,30 @@ public class SignUpActivity extends AppCompatActivity {
                 });
     }
 
+    private void updateUserProfile(Uri photoUrl) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
+
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(tDisplayName.getText().toString())
+                .setPhotoUri(photoUrl)
+                .build();
+
+        user.updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User profile updated.");
+
+                            Log.i(TAG, "profileUpdates: succeed");
+                            Log.i(TAG, "Display Name = " + user.getDisplayName());
+                            Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
+                        }
+                    }
+                });
+        finish();
+    }
     private void selectImage() {
 //        Intent intent = new Intent(SendPostActivity.this, PhotoActivity.class);
         EasyPhotos.createAlbum(SignUpActivity.this, true, false, GlideEngine.getInstance())
