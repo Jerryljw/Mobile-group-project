@@ -4,11 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,25 +20,18 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.Camera;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.view.PreviewView;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.FragmentMapBinding;
-import com.comp90018.proj2.ui.login.LoginActivity;
 import com.comp90018.proj2.ui.post.PostActivity;
 import com.comp90018.proj2.ui.sendPost.SendPostActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -50,20 +39,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 
 public class MapFragment extends Fragment
@@ -109,15 +88,18 @@ public class MapFragment extends Fragment
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
     private int REQUEST_CODE_PERMISSIONS = 1001;
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     /**
      * Request code for location permission request.
      *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -152,6 +134,8 @@ public class MapFragment extends Fragment
 
             Intent intent = new Intent();
             intent.setClass(getActivity(), SendPostActivity.class);
+
+//            intent.setClass(getActivity(), SendPostActivity.class);
             startActivity(intent);
         });
 

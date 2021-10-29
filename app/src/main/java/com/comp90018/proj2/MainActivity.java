@@ -17,10 +17,14 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+
 import com.comp90018.proj2.ui.map.MapFragment;
 import com.comp90018.proj2.utils.LocationCommunication;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -38,10 +42,13 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.comp90018.proj2.databinding.ActivityMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -64,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationUpdate();
 
+
+        Log.i(TAG, "onCreate: ");
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -88,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
+
 
     /**
      * Override interface, child fragments will callback on this method
@@ -191,4 +201,24 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         return (c * r);
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "onPause: ");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "onDestroy: ");
+
+    }
 }
