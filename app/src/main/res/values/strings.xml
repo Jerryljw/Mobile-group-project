@@ -31,9 +31,10 @@
     <string name="prompt_post_lon">Longitude</string>
     <string name="prompt_post_lat">Latitude</string>
     <string name="action_send_post">Send Post</string>
-    <string name="invalid_latitude">Not a valid latitude.</string>
-    <string name="invalid_longitude">Not a valid longitude.</string>
-    <string name="invalid_post_image">Please choose a image.</string>
+    <string name="invalid_image">Please choose a image</string>
+    <string name="invalid_title">Not a valid Post Title.</string>
+    <string name="invalid_message">Not a valid Post Message.</string>
+
 
 
     <!-- Find -->
@@ -56,5 +57,7 @@
     <string name="sign_up">Sign Up</string>
     <string name="display_name">Display Name</string>
     <string name="post_type">Post Type</string>
+    <string name="post_title">Post Title</string>
+    <string name="message">Message</string>
 
 </resources>
