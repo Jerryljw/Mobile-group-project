@@ -27,6 +27,7 @@ import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.MainActivity;
+import com.comp90018.proj2.utils.GlideApp;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -82,8 +83,6 @@ public class PostActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        int postId = bundle.getInt("postId");
-
         firebaseFirestore=FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -100,53 +99,61 @@ public class PostActivity extends AppCompatActivity {
         btnAddComment =findViewById(R.id.comment_button);
 
         // post id传递
-        Log.d("post", "posteeeee"+String.valueOf(postId));
-
         postItem = new PostItem();
-        PostKey = "cYmutQb9s00wcn1dd6AS";
+        PostKey = "cYmutQb9s00wcn1dd6AS"; //bundle.get;
 
 
         btnAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                btnAddComment.setVisibility(View.INVISIBLE);
+                if (editTextComment.getText().toString().equals("")) {
+                    Toast.makeText(getApplicationContext(), "Please input comment", Toast.LENGTH_SHORT).show();
+                } else {
+                    btnAddComment.setVisibility(View.INVISIBLE);
 //                DatabaseReference commentReference = firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY);
-                String comment_content = editTextComment.getText().toString();
+                    String comment_content = editTextComment.getText().toString();
 
-                String uid = firebaseUser.getUid();
-                String uname = firebaseUser.getDisplayName();
-                String uimg = ""; //firebaseUser.getPhotoUrl().toString();
+                    String uid = firebaseUser.getUid();
+                    String uname;
+                    if (firebaseUser.getDisplayName().equals("")) {
+                        uname = "user-" + firebaseUser.getUid();
+                    } else {
+                        uname = firebaseUser.getDisplayName();
+                    }
 
-                CommentItem comment = new CommentItem(comment_content,uid,uimg,uname);
-                Map<String, Object> data = new HashMap<>();
-                data.put("CommentContent", comment.getContent());
-                data.put("CommentTime", comment.getTimestamp());
-                data.put("CommentUserHeadicon", comment.getUimg());
-                data.put("CommentUserId", comment.getUid());
-                data.put("CommentUsername", comment.getUname());
+                    String uimg = ""; //firebaseUser.getPhotoUrl().toString();
 
-                Log.d("TAG", "onClick: add data"+ comment.getUid());
+                    CommentItem comment = new CommentItem(comment_content, uid, uimg, uname);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("CommentContent", comment.getContent());
+                    data.put("CommentTime", comment.getTimestamp());
+                    data.put("CommentUserHeadicon", comment.getUimg());
+                    data.put("CommentUserId", comment.getUid());
+                    data.put("CommentUsername", comment.getUname());
 
-                firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY)
-                        .add(data)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.d("TAG", "onSuccess: onClick: add data ");
-                                Toast.makeText(getApplicationContext(),"comment added", Toast.LENGTH_SHORT);
-                                editTextComment.setText("");
-                                btnAddComment.setVisibility(View.VISIBLE);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull @NotNull Exception e) {
-                                Log.d("TAG", "onfil: onClick: add data ");
-                                Toast.makeText(getApplicationContext(),"comment added failure", Toast.LENGTH_SHORT);
-                            }
-                        });
+                    Log.d("TAG", "onClick: add data" + comment.getUid());
 
+                    firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY)
+                            .add(data)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Log.d("TAG", "onSuccess: onClick: add data ");
+                                    Toast.makeText(getApplicationContext(), "comment added", Toast.LENGTH_SHORT).show();
+                                    editTextComment.setText("");
+                                    btnAddComment.setVisibility(View.VISIBLE);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull @NotNull Exception e) {
+                                    Log.d("TAG", "onfil: onClick: add data ");
+                                    Toast.makeText(getApplicationContext(), "comment added failure", Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+                    iniRvComment();
+                }
             }
         });
 
@@ -166,15 +173,29 @@ public class PostActivity extends AppCompatActivity {
                     StorageReference gsReference = firebaseStorage
                             .getReferenceFromUrl((String)  dataMap.get("PostImage"));
 
-                    Glide.with(getApplication())
+                    GlideApp.with(getApplication())
                             .load(gsReference)
+                            .centerCrop()
                             .apply(new RequestOptions()
                                     .placeholder(R.drawable.ic_card_image)
                                     .fitCenter())
                             .into(imgPost);
 
+                    GlideApp.with(getApplication())
+                            .load(String.valueOf(firebaseUser.getPhotoUrl()))
+                            .apply(new RequestOptions()
+                            .placeholder(R.drawable.ic_card_portrait)
+                            .fitCenter())
+                            .into(imgUserPost);
                     //load description
                     txtPostDesc.setText((String) dataMap.get("PostMessage"));
+
+                     if(firebaseUser.getDisplayName().equals("")){
+                        txtPostUsername.setText("User-"+firebaseUser.getUid());
+                    }
+                    else{
+                        txtPostUsername.setText(firebaseUser.getDisplayName());
+                    }
 
                 }
             }
@@ -205,7 +226,6 @@ public class PostActivity extends AppCompatActivity {
 
     private void iniRvComment() {
 
-
         Log.d("TAG", "onSuccess11: " + "hellsoosos");
         Task<QuerySnapshot> commentRef = firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY).get();
         commentRef.addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -234,16 +254,7 @@ public class PostActivity extends AppCompatActivity {
 
 
     }
-    @GlideModule
-    public class MyAppGlideModule extends AppGlideModule {
 
-        @Override
-        public void registerComponents(Context context, Glide glide, Registry registry) {
-            // Register FirebaseImageLoader to handle StorageReference
-            registry.append(StorageReference.class, InputStream.class,
-                    new FirebaseImageLoader.Factory());
-        }
-    }
     public void back_onclick(View view)
     {
         Intent intent=new Intent();

@@ -13,11 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.comp90018.proj2.R;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,7 +43,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull CommentViewHolder holder, int position) {
-        Glide.with(mContext).load(commentData.get(position).getUimg()).into(holder.img_user);
+        Glide.with(mContext).load(commentData.get(position).getUimg()).apply(new RequestOptions()
+                .placeholder(R.drawable.ic_card_portrait)
+                .fitCenter()).into(holder.img_user);
         holder.tv_name.setText(commentData.get(position).getUname());
         holder.tv_content.setText(commentData.get(position).getContent());
         Log.d("TAG", "setTimestamp: "+ commentData.get(position).getTimestamp().toString());
@@ -68,10 +72,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         }
     }
     private String timestampToString(long time) {
-
-        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(time);
-        String date = DateFormat.format("hh:mm",calendar).toString();
-        return date;
+        Date thisdate = new Date(time*1000);
+        String string_date = DateFormat.format("dd/MM/yy hh:mm",thisdate).toString();
+        return string_date;
     }
 }

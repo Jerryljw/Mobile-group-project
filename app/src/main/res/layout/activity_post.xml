@@ -1,217 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#fff"
+    tools:context=".ui.post.PostActivity"
     android:orientation="vertical">
 
-    // back to starter button
+<!--    // back to starter button-->
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+<!--    <RelativeLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content">-->
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
+<!--        <ImageView-->
+<!--            android:layout_width="32dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_alignParentStart="true"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            android:layout_marginTop="8dp"-->
 
-            android:layout_marginBottom="2dp"
-            android:clickable="true"
-            android:onClick="back_onclick"
-            android:src="@drawable/ic_post_back" />
-    </RelativeLayout>
+<!--            android:layout_marginBottom="2dp"-->
+<!--            android:clickable="true"-->
+<!--            android:onClick="back_onclick"-->
+<!--            android:src="@drawable/ic_post_back" />-->
+<!--    </RelativeLayout>-->
 
     <!--the line under back button-->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_marginTop="5dp"
-        android:background="#333333" />
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0.5dp"-->
+<!--        android:layout_marginTop="5dp"-->
+<!--        android:background="#333333" />-->
 
     <!--personal information-->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:layout_width="303dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3.0">
-            <!--username-->
-            <ImageView
-                android:id="@+id/post_userhead"
-                android:layout_width="20dp"
-                android:layout_height="17dp"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_card_portrait" />
-
-            <!--TODO: 这里要调用名称-->
-            <TextView
-                android:id="@+id/post_username"
-                android:layout_width="wrap_content"
-                android:layout_height="25dp"
-                android:layout_marginTop="8dp"
-                android:text="XXX"
-                android:textColor="#333333"
-                android:textSize="15sp" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/imageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginLeft="10dp"
-            android:text="Location"
-            android:textSize="15sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/post_img"
+            android:layout_width="0dp"
+            android:layout_height="250dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_card_image" />
+        <TextView
+            android:id="@+id/post_title_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:lineSpacingExtra="4dp"
+            android:text="TextView"
+            android:textColor="@android:color/black"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post_img"/>
+        <View
+            android:background="#2e2e2e"
+            android:id="@+id/view"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post_title_view" />
 
         <TextView
-            android:id="@+id/userid"
+            android:textSize="12sp"
+            android:id="@+id/post_username"
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
-            android:layout_marginLeft="8dp"
-            android:text="ID:"
-            android:textColor="#333333"
-            android:textSize="15sp" />
-    </LinearLayout>
-
-    <!--the line under personal info-->
-    <!--    <View-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="0.5dp"-->
-    <!--        android:layout_marginTop="5dp"-->
-    <!--        android:background="#333333"/>-->
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="#f2f2f2">
-
-        <LinearLayout
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view" />
 
-            <ImageView
-                android:id="@+id/post_img"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:src="@drawable/ic_card_image" />
-            <!--line between image and button-->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginTop="5dp"
-                android:background="#333333" />
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:id="@+id/post_userhead"
+            app:layout_constraintTop_toBottomOf="@id/view"
+            app:layout_constraintLeft_toRightOf="@id/post_username"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_card_portrait"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+        <TextView
+            android:textColor="#373737"
+            android:lineSpacingExtra="8dp"
+            android:id="@+id/post_textview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="gsdugbsdnbdasn anngngasnasng;kskamkm mak dgkasdgmas'dmdg'asm;mavasmdamgmetmsakgmasdk  mkmdmgksa bsadmskadmfmasdfmas'sak'sammfsdm'f;asdsdm"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post_username"/>
 
-                <!-- Check Location Button-->
+        <ImageView
+            android:id="@+id/post_detail_currentuser_img"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post_textview"
+            tools:srcCompat="@tools:sample/avatars" />
 
-                <!-- thumb up, comments and subscribe-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="vertical">
+        <EditText
 
-                    <!-- thumb up -->
+            android:hint="Write Comment"
+            android:id="@+id/comment_edit_multiline_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toBottomOf="@+id/post_detail_currentuser_img"
+            app:layout_constraintStart_toEndOf="@+id/post_detail_currentuser_img"
+            app:layout_constraintTop_toTopOf="@+id/post_detail_currentuser_img" />
 
-                    <!-- comments -->
+        <Button
+            android:id="@+id/comment_button"
+            android:layout_width="63dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="Add"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toBottomOf="@+id/comment_edit_multiline_text"
+            app:layout_constraintStart_toEndOf="@+id/comment_edit_multiline_text"
+            app:layout_constraintTop_toTopOf="@+id/comment_edit_multiline_text"
+            app:layout_constraintVertical_bias="0.529" />
 
-                    <TextView
-                        android:id="@+id/post_title_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="title" />
-
-                    <TextView
-                        android:id="@+id/post_textview"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginRight="2dp"
-                        android:layout_weight="1"
-                        android:text="post text" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:id="@+id/send_comment_layout">
-
-                <!-- vertical line-->
-                <Button
-                    android:id="@+id/comment_button"
-                    android:layout_width="1dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="comment" />
-
-                <!--plants-->
-
-                <EditText
-                    android:id="@+id/comment_edit_multiline_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine" />
-
-            </LinearLayout>
             <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+
                 android:id="@+id/comments_recycle_view"
-
-                />
-            <!--            <TextView-->
-            <!--                android:id="@+id/home_item_title"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginLeft="8dp"-->
-            <!--                android:maxLines="2"-->
-            <!--                android:text="Location"-->
-            <!--                android:textColor="#333" />-->
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            id
-        </LinearLayout>
-
-
-    </RelativeLayout>
-
-
-    <!--line at the bottom of the navigation-->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_gravity="bottom"
-        android:background="#333" />
-
-
-</LinearLayout>
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/comment_edit_multiline_text"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView >
