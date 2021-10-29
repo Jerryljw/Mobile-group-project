@@ -54,7 +54,7 @@ import java.util.Objects;
 
 public class PostActivity extends AppCompatActivity {
     PostItem postItem;
-    ImageView imgPost,imgUserPost;
+    ImageView imgPost,imgUserPost,currentUserHeadicon;
     TextView txtPostDesc, txtPostUsername,txtPostTitle;
     EditText editTextComment;
     Button btnAddComment, locatePostButton;
@@ -90,6 +90,7 @@ public class PostActivity extends AppCompatActivity {
         //initial views
         imgPost =findViewById(R.id.post_img);
         imgUserPost = findViewById(R.id.post_userhead);
+        currentUserHeadicon = findViewById(R.id.post_currentuser_img);
 
         txtPostTitle = findViewById(R.id.post_title_view);
         txtPostDesc = findViewById(R.id.post_textview);
@@ -161,7 +162,7 @@ public class PostActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        
+
                     }
                 }
         );
@@ -193,15 +194,17 @@ public class PostActivity extends AppCompatActivity {
                             .apply(new RequestOptions()
                             .placeholder(R.drawable.ic_card_portrait)
                             .fitCenter())
-                            .into(imgUserPost);
+                            .into(currentUserHeadicon);
+
+                    imgUserPost.setImageResource(R.drawable.ic_card_portrait);
                     //load description
                     txtPostDesc.setText((String) dataMap.get("PostMessage"));
 
-                     if(firebaseUser.getDisplayName().equals("")){
-                        txtPostUsername.setText("User-"+firebaseUser.getUid());
+                     if((dataMap.get("UserDisplayname").equals(""))){
+                        txtPostUsername.setText("User-"+dataMap.get("UserId"));
                     }
                     else{
-                        txtPostUsername.setText(firebaseUser.getDisplayName());
+                        txtPostUsername.setText((String)dataMap.get("UserDisplayname"));
                     }
 
                 }
@@ -213,17 +216,6 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
-//        String postImage = bundle.getString("postImage") ;
-//        Glide.with(this).load(postImage).into(imgPost);
-
-//        String postTitle = bundle.getString("title");
-//        txtPostTitle.setText(postTitle);
-//
-//        String userpostImage = bundle.getString("userPhoto");
-//        Glide.with(this).load(userpostImage).into(imgUserPost);
-
-//        String postDescription = bundle.getString("description");
-//        txtPostDesc.setText(postDescription);
 
         RvComment =  findViewById(R.id.comments_recycle_view);
         RvComment.setLayoutManager(new LinearLayoutManager(this));
