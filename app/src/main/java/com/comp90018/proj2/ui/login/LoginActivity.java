@@ -119,6 +119,9 @@ public class LoginActivity extends AppCompatActivity {
             FirebaseUser user = firebaseAuth.getCurrentUser();
 
             if (user != null) {
+                Log.i(TAG, "Display Name = " + user.getDisplayName());
+                Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
+
                 updateUiWithUser(user);
             } else {
                 // User is signed out

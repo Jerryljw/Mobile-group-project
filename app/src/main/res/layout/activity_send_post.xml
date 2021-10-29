@@ -22,22 +22,38 @@
         tools:ignore="SpeakableTextPresentCheck"
         android:contentDescription="@string/select_post_image" />
 
-    <EditText
+
+    <TextView
         android:id="@+id/text_post_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        android:autofillHints="@string/prompt_post_type"
-        android:hint="@string/prompt_post_type"
+        android:text="@string/post_type"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_newImage" />
+
+    <com.kyleduo.switchbutton.SwitchButton
+        android:id="@+id/switch_post_type"
+        android:layout_width="140dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
         android:imeActionLabel="@string/action_sign_in_short"
         android:imeOptions="actionDone"
         android:inputType="text"
         android:minHeight="48dp"
         android:selectAllOnFocus="true"
+        app:kswTextOff="@string/post_type_off"
+        app:kswTextOn="@string/post_type_on"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.556"
+        app:layout_constraintLeft_toRightOf="@+id/text_post_type"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_newImage" />
 
@@ -47,7 +63,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
         android:autofillHints="@string/prompt_post_species"
         android:hint="@string/prompt_post_species"
@@ -66,12 +82,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="24dp"
         android:text="@string/prompt_post_location"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_post_species" />
 

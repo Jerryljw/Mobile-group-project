@@ -76,4 +76,5 @@ dependencies {
 
     /** UI **/
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.kyleduo.switchbutton:library:2.1.0'
 }
