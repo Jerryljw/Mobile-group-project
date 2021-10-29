@@ -34,39 +34,21 @@ public class SendPostViewModel extends ViewModel {
         this.latitude.setValue(String.valueOf(latitude));
     }
 
-    public void locationDataChanged(String latitude, String longitude) {
-        Log.i(TAG, "Latitude: " + latitude + "; Longitude: " + longitude);
-        if (!isLatitudeValid(latitude)) {
-            sendPostFormState.setValue(new SendPostFormState(R.string.invalid_latitude, null));
-        } else if (!isLongitudeValid(longitude)) {
-            sendPostFormState.setValue(new SendPostFormState(null, R.string.invalid_longitude));
+    public void formDataChanged(String image, String title, String message) {
+        Log.i(TAG, "Image: " + image + "; Title: " + title + "; Message: " + message);
+        if (isEmptyString(image)) {
+            sendPostFormState.setValue(new SendPostFormState(R.string.invalid_image, null, null));
+        } else if (isEmptyString(title)) {
+            sendPostFormState.setValue(new SendPostFormState(null, R.string.invalid_title, null));
+        } else if (isEmptyString(message)) {
+            sendPostFormState.setValue(new SendPostFormState(null, null, R.string.invalid_message));
         } else {
             sendPostFormState.setValue(new SendPostFormState(true));
         }
     }
 
-    private boolean isLatitudeValid(String latitude) {
-        if (latitude == null) {
-            return false;
-        }
-        try {
-            Double.parseDouble(latitude);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private boolean isLongitudeValid(String longitude) {
-        if (longitude == null) {
-            return false;
-        }
-        try {
-            Double.parseDouble(longitude);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    private boolean isEmptyString(String input) {
+        return input == null || "".equals(input);
     }
 
     public MutableLiveData<SendPostFormState> getSendPostFormState() {
