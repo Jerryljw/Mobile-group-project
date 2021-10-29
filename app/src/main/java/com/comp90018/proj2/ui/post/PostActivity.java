@@ -1,15 +1,23 @@
 package com.comp90018.proj2.ui.post;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +37,17 @@ import com.comp90018.proj2.R;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.utils.GlideApp;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.request.RequestOptions;
+import com.comp90018.proj2.MainActivity;
+import com.comp90018.proj2.R;
+import com.comp90018.proj2.utils.GlideApp;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -45,16 +64,20 @@ import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
+
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import java.util.Objects;
 
 public class PostActivity extends AppCompatActivity {
     PostItem postItem;
     ImageView imgPost,imgUserPost,currentUserHeadicon;
+
     TextView txtPostDesc, txtPostUsername,txtPostTitle;
     EditText editTextComment;
     Button btnAddComment, locatePostButton;
@@ -67,7 +90,11 @@ public class PostActivity extends AppCompatActivity {
     CommentAdapter commentAdapter;
     List<CommentItem> listComment;
     static String COMMENT_KEY = "Comments" ;
-    static String POST_KEY = "Post";
+
+    //static String POST_KEY = "Post";
+
+    static String POST_KEY = "Post_Temp";
+
     static String COMMENT_CONTENT = "CommentContent";
     static String COMMENT_TIME = "CommentTime";
     static String COMMENT_USERHEADICON = "CommentUserHeadicon";
@@ -90,7 +117,9 @@ public class PostActivity extends AppCompatActivity {
         //initial views
         imgPost =findViewById(R.id.post_img);
         imgUserPost = findViewById(R.id.post_userhead);
+
         currentUserHeadicon = findViewById(R.id.post_currentuser_img);
+
 
         txtPostTitle = findViewById(R.id.post_title_view);
         txtPostDesc = findViewById(R.id.post_textview);
@@ -101,7 +130,11 @@ public class PostActivity extends AppCompatActivity {
         locatePostButton = findViewById(R.id.locate_post_button);
         // post id传递
         postItem = new PostItem();
-        PostKey = "cYmutQb9s00wcn1dd6AS"; //bundle.get;
+
+
+        PostKey = bundle.getString("postId"); //bundle.get;
+        Log.e("PostKey!",PostKey);
+
 
 
         btnAddComment.setOnClickListener(new View.OnClickListener() {
@@ -163,6 +196,12 @@ public class PostActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
+                        Intent intent1 = new Intent(PostActivity.this, MainActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("fromLocationToMap",1);
+                        intent1.putExtras(bundle);
+                        startActivity(intent1);
+
                     }
                 }
         );
@@ -180,6 +219,7 @@ public class PostActivity extends AppCompatActivity {
                     Log.d("TAG", "onSuccess: " + dataMap.get("PostImage"));
                     StorageReference gsReference = firebaseStorage
                             .getReferenceFromUrl((String)  dataMap.get("PostImage"));
+
 
 
 
@@ -208,6 +248,7 @@ public class PostActivity extends AppCompatActivity {
                                     .placeholder(R.drawable.ic_card_image)
                                     .fitCenter())
                             .into(imgPost);
+
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -222,6 +263,7 @@ public class PostActivity extends AppCompatActivity {
         RvComment.setLayoutManager(new LinearLayoutManager(this));
         // initial Recycle view comments
         iniRvComment();
+
     }
 
     private void iniRvComment() {
@@ -254,6 +296,7 @@ public class PostActivity extends AppCompatActivity {
 
 
     }
+
 
     public void back_onclick(View view)
     {

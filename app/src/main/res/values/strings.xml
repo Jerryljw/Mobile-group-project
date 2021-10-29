@@ -29,8 +29,11 @@
     <string name="action_send_post">Send Post</string>
 
 
-
-
+    <!-- Find -->
+    <string-array name="spingarr">
+        <item>Latest Post Time</item>
+        <item>Nearest Post Location</item>
+    </string-array>
 
 
     <!--    Permissions    -->
