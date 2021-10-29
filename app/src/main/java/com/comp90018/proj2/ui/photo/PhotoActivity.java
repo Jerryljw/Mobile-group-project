@@ -1,19 +1,9 @@
 package com.comp90018.proj2.ui.photo;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.huantansheng.easyphotos.EasyPhotos;
-import com.huantansheng.easyphotos.callback.SelectCallback;
-import com.huantansheng.easyphotos.models.album.entity.Photo;
-
-import java.io.File;
-import java.util.ArrayList;
 
 public class PhotoActivity extends AppCompatActivity {
 

@@ -1,17 +1,11 @@
 package com.comp90018.proj2.ui.sendPost;
 
-import android.location.Location;
 import android.util.Log;
-import android.util.Patterns;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.comp90018.proj2.R;
-import com.comp90018.proj2.ui.login.LoginFormState;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 public class SendPostViewModel extends ViewModel {
     private String TAG = "SendPostViewModel";

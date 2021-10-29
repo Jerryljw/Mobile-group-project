@@ -29,7 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.post.PostActivity"
             android:parentActivityName=".MainActivity"
@@ -40,6 +39,7 @@
         
         <activity android:name=".MainActivity" />
         <activity android:name=".ui.sendPost.SendPostActivity" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

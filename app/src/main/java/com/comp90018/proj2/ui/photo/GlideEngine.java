@@ -1,7 +1,5 @@
 package com.comp90018.proj2.ui.photo;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,6 +9,8 @@ import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.huantansheng.easyphotos.engine.ImageEngine;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 /**
  * Glide4.x的加载图片引擎实现,单例模式

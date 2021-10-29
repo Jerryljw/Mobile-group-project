@@ -1,28 +1,13 @@
 package com.comp90018.proj2.ui.finder;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static androidx.core.content.PermissionChecker.checkCallingOrSelfPermission;
 
-
-import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import com.comp90018.proj2.*;
-import android.content.Context;
-import android.content.Intent;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.fragment.app.Fragment;
-
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
