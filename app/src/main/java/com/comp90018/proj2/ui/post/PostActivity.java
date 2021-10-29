@@ -151,7 +151,11 @@ public class PostActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        
+                        Intent intent1 = new Intent(PostActivity.this, MainActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("fromLocationToMap",1);
+                        intent1.putExtras(bundle);
+                        startActivity(intent1);
                     }
                 }
         );

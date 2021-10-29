@@ -146,7 +146,6 @@ public class AnimalFinderFragment extends Fragment {
             public void OnItemClick(View view, CardItem cardItem) {
 
                 // jump to post activity
-                // TODO: need to pass postId to PostActivity
                 Intent intent = new Intent(getActivity(), PostActivity.class);
                 Bundle bundle = new Bundle();
                 Log.e(TAG, String.valueOf(cardItem.getPostId()));
@@ -208,7 +207,9 @@ public class AnimalFinderFragment extends Fragment {
                                                             cardItem.setPostTime(postTime);
                                                             cardItem.setPostFlag(Integer.parseInt(postFlag));
 
-                                                            cardItemArrayList.add(cardItem);
+                                                            cardItem.setPostType(postType);
+                                                            if(postType.equalsIgnoreCase("Animal")){
+                                                            cardItemArrayList.add(cardItem);}
                                                             homeAdapter = new HomeAdapter(getActivity(),
                                                                     cardItemArrayList,current);
                                                             recyclerView.setAdapter(homeAdapter);

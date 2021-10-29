@@ -18,6 +18,22 @@ public class CardItem {
     private String postSpecies;
     private String postType;
 
+    public String getPostSpecies() {
+        return postSpecies;
+    }
+
+    public void setPostSpecies(String postSpecies) {
+        this.postSpecies = postSpecies;
+    }
+
+    public String getPostType() {
+        return postType;
+    }
+
+    public void setPostType(String postType) {
+        this.postType = postType;
+    }
+
     // set a default value which is unsolved
     private int postFlag;
 

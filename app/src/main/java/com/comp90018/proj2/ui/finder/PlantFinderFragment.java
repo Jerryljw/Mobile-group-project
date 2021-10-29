@@ -214,8 +214,10 @@ public class PlantFinderFragment extends Fragment {
                                                             cardItem.setPostTime(postTime);
                                                             cardItem.setPostId(postId);
                                                             cardItem.setPostFlag(Integer.parseInt(postFlag));
-
-                                                            cardItemArrayList.add(cardItem);
+                                                            cardItem.setPostType(postType);
+                                                            Log.e("PostType",postType);
+                                                            if(postType.equalsIgnoreCase("Plant")){
+                                                                cardItemArrayList.add(cardItem);}
 
                                                             // refresh view
                                                             homeAdapter = new HomeAdapter(getActivity(),
