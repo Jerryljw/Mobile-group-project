@@ -102,7 +102,11 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
 
             // When GPS LocationProvider is on, update current location with real data
             Location temp = (lm.getLastKnownLocation(provider));
-            current = locationCvtGeo(temp);
+            if (temp == null) {
+                current = new GeoPoint(-34, 151);
+            } else {
+                current = locationCvtGeo(temp);
+            }
         }
         
         public void onProviderDisabled(String provider) {
@@ -137,7 +141,11 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         }
 
         Location location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        current = locationCvtGeo(location);
+        if (location == null) {
+            current = new GeoPoint(-34, 151);
+        } else {
+            current = locationCvtGeo(location);
+        }
         // Log.e("current location", String.valueOf(current));
 
         // For every 2s, update user's location
