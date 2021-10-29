@@ -57,7 +57,7 @@ public class PostActivity extends AppCompatActivity {
     ImageView imgPost,imgUserPost;
     TextView txtPostDesc, txtPostUsername,txtPostTitle;
     EditText editTextComment;
-    Button btnAddComment;
+    Button btnAddComment, locatePostButton;
     String PostKey;
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
@@ -97,7 +97,7 @@ public class PostActivity extends AppCompatActivity {
 
         editTextComment = findViewById(R.id.comment_edit_multiline_text);
         btnAddComment =findViewById(R.id.comment_button);
-
+        locatePostButton = findViewById(R.id.locate_post_button);
         // post id传递
         postItem = new PostItem();
         PostKey = "cYmutQb9s00wcn1dd6AS"; //bundle.get;
@@ -156,8 +156,15 @@ public class PostActivity extends AppCompatActivity {
                 }
             }
         });
-
-
+        // TODO: 2021/10/29 : add locate button listener
+        locatePostButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        
+                    }
+                }
+        );
 
         //bind data to all views
         DocumentReference postReference = firebaseFirestore.collection(POST_KEY).document(PostKey);
