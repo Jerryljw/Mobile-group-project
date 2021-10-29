@@ -1,9 +1,11 @@
 package com.comp90018.proj2.ui.account;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,6 +16,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.comp90018.proj2.databinding.FragmentAccountBinding;
+import com.comp90018.proj2.ui.login.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class AccountFragment extends Fragment {
 
@@ -23,6 +27,9 @@ public class AccountFragment extends Fragment {
     private TextView emailTxtView, phoneTxtView, videoTxtView, facebookTxtView, twitterTxtView;
     private ImageView userImageView, emailImageView, phoneImageView, videoImageView;
     private ImageView facebookImageView, twitterImageView;
+
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -59,6 +66,17 @@ public class AccountFragment extends Fragment {
                 textView.setText(s);
             }
         });
+
+        final Button logoutButton = binding.logout;
+        logoutButton.setOnClickListener(view -> {
+            mAuth.signOut();
+
+            Intent intent = new Intent();
+            intent.setClass(requireActivity().getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+
+        });
+
         return root;
 
 

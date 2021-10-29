@@ -1,12 +1,8 @@
 package com.comp90018.proj2.ui.finder;
-import com.comp90018.proj2.ui.post.*;
-import android.os.Bundle;
-import com.comp90018.proj2.*;
-import android.app.Activity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,17 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.fragment.app.Fragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.comp90018.proj2.R;
+import com.comp90018.proj2.ui.post.PostActivity;
+
 import java.util.ArrayList;
 
 

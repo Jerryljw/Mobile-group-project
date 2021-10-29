@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivityLoginBinding;
+import com.comp90018.proj2.ui.signUp.SignUpActivity;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -72,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         final EditText usernameEditText = binding.email;
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
+        final TextView signUpText = binding.signUp;
         final ProgressBar loadingProgressBar = binding.loading;
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -116,13 +119,15 @@ public class LoginActivity extends AppCompatActivity {
             FirebaseUser user = firebaseAuth.getCurrentUser();
 
             if (user != null) {
+                Log.i(TAG, "Display Name = " + user.getDisplayName());
+                Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
+
                 updateUiWithUser(user);
             } else {
                 // User is signed out
                 Log.d(TAG, "onAuthStateChanged:signed_out");
 //                showLoginFailed(null);
             }
-
         };
         // [END auth_state_listener]
 
@@ -136,6 +141,15 @@ public class LoginActivity extends AppCompatActivity {
 
             loadingProgressBar.setVisibility(View.INVISIBLE);
         });
+
+        // [START sign_up_click_listener]
+        signUpText.setOnClickListener(v -> {
+            Log.i(TAG, "signUpText onClick: ");
+
+            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+            startActivity(intent);
+        });
+        // [END sign_up_click_listener]
     }
 
     private void login(String email, String password) {

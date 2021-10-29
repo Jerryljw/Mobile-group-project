@@ -1,15 +1,14 @@
 package com.comp90018.proj2.ui.post;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.comp90018.proj2.R;
 import com.comp90018.proj2.MainActivity;
+import com.comp90018.proj2.R;
 public class PostActivity extends AppCompatActivity {
     PostItem postItem;
     @Override

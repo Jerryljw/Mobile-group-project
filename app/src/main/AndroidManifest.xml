@@ -34,6 +34,17 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".ui.sendPost.SendPostActivity" />
 
+        <activity android:name =".ui.signUp.SignUpActivity"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.comp90018.proj2.ui.photo.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths_public" />
+        </provider>
     </application>
 
 </manifest>
