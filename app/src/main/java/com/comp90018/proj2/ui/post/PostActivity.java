@@ -181,20 +181,7 @@ public class PostActivity extends AppCompatActivity {
                     StorageReference gsReference = firebaseStorage
                             .getReferenceFromUrl((String)  dataMap.get("PostImage"));
 
-                    GlideApp.with(getApplication())
-                            .load(gsReference)
-                            .centerCrop()
-                            .apply(new RequestOptions()
-                                    .placeholder(R.drawable.ic_card_image)
-                                    .fitCenter())
-                            .into(imgPost);
 
-                    GlideApp.with(getApplication())
-                            .load(String.valueOf(firebaseUser.getPhotoUrl()))
-                            .apply(new RequestOptions()
-                            .placeholder(R.drawable.ic_card_portrait)
-                            .fitCenter())
-                            .into(currentUserHeadicon);
 
                     imgUserPost.setImageResource(R.drawable.ic_card_portrait);
                     //load description
@@ -207,6 +194,20 @@ public class PostActivity extends AppCompatActivity {
                         txtPostUsername.setText((String)dataMap.get("UserDisplayname"));
                     }
 
+
+                    GlideApp.with(getApplication())
+                            .load(String.valueOf(firebaseUser.getPhotoUrl()))
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.ic_card_portrait)
+                                    .fitCenter())
+                            .into(currentUserHeadicon);
+                    GlideApp.with(getApplication())
+                            .load(gsReference)
+                            .centerCrop()
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.ic_card_image)
+                                    .fitCenter())
+                            .into(imgPost);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
