@@ -11,12 +11,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.databinding.FragmentFindBinding;
 import com.comp90018.proj2.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,6 +57,13 @@ public class FindFragment extends Fragment {
 
 
         return root;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
     }
 
     @Override

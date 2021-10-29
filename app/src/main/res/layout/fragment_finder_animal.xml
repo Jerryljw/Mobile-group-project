@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical">
+
+
+    <!--selector-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/animal_sp"
+            android:layout_width="118dp"
+            android:layout_height="match_parent"
+            android:entries="@array/spingarr"/>
+
+    </LinearLayout>
+    <!--line between card items and sort-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="5dp"
+        android:background="#333333" />
+
+
+    <!--中间存放item，这个RelativeLayout是为了展示item的地方占满屏，把菜单栏挤到最底端-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#f2f2f2">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/home_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2.5dp" />
+    </RelativeLayout>
+
+    <!--line at the bottom of the navigation-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_gravity="bottom"
+        android:background="#333" />
+
+    <!-- add space at the bottom-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:orientation="horizontal" />
+
+
+</LinearLayout>

@@ -6,8 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.comp90018.proj2.ui.login.LoginViewModel;
-
 import org.jetbrains.annotations.NotNull;
 
 public class SendPostViewModelFactory  implements ViewModelProvider.Factory {
