@@ -29,12 +29,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name =".ui.post.PostActivity"/>
+        <activity
+            android:name=".ui.post.PostActivity"
+            android:parentActivityName=".MainActivity"
+            android:label="Details">
+        </activity>
 
+        <activity android:name =".ui.signUp.SignUpActivity"/>
+        
         <activity android:name=".MainActivity" />
         <activity android:name=".ui.sendPost.SendPostActivity" />
 
-        <activity android:name =".ui.signUp.SignUpActivity"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
