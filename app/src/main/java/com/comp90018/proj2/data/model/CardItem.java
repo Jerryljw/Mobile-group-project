@@ -15,9 +15,11 @@ public class CardItem {
     private int headsIcon;
     private String usernames;
     private Timestamp postTime;
+    private String postSpecies;
+    private String postType;
 
     // set a default value which is unsolved
-    private int postType = 0;
+    private int postFlag;
 
     // TODO: need to read from db as Coordinates to do calculate or??
     private GeoPoint point;
@@ -39,12 +41,12 @@ public class CardItem {
         this.postId = postId;
     }
 
-    public int getPostType() {
-        return postType;
+    public int getPostFlag() {
+        return postFlag;
     }
 
-    public void setPostType(int postType) {
-        this.postType = postType;
+    public void setPostFlag(int postFlag) {
+        this.postFlag = postFlag;
     }
 
     public String getUserId() {

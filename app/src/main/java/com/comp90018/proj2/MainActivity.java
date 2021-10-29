@@ -17,6 +17,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.comp90018.proj2.ui.map.MapFragment;
 import com.comp90018.proj2.utils.LocationCommunication;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,7 +27,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
+import androidx.navigation.NavInflater;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -70,6 +75,16 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+
+        // check if come from the Post Location Button
+        if(getIntent().getIntExtra("fromLocationToMap",0)==1){
+
+            NavInflater navInflater = navController.getNavInflater();
+            NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
+            navGraph.setStartDestination(R.id.navigation_dashboard);
+            navController.setGraph(navGraph, new Bundle());
+        }
+
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }

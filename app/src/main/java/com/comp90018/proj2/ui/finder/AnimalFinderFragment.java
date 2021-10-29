@@ -187,14 +187,15 @@ public class AnimalFinderFragment extends Fragment {
                                                                     .getString("PostType");
                                                             String postUserid = documentSnapshot
                                                                     .getString("UserId");
+                                                            String postFlag = documentSnapshot
+                                                                    .getString("PostFlag");
                                                             GeoPoint postGeoPoint = documentSnapshot
                                                                     .getGeoPoint("PostLocation");
                                                             String postImg = documentSnapshot
                                                                     .getString("PostImage");
                                                             String postTitle = documentSnapshot
                                                                     .getString("PostTitle");
-                                                            String postId = documentSnapshot
-                                                                    .getString("PostId");
+                                                            String postId = document.getId();
 
                                                             // set data
                                                             CardItem cardItem = new CardItem();
@@ -205,7 +206,7 @@ public class AnimalFinderFragment extends Fragment {
                                                             cardItem.setPoint(postGeoPoint);
                                                             cardItem.setPostId(postId);
                                                             cardItem.setPostTime(postTime);
-
+                                                            cardItem.setPostFlag(Integer.parseInt(postFlag));
 
                                                             cardItemArrayList.add(cardItem);
                                                             homeAdapter = new HomeAdapter(getActivity(),
@@ -289,11 +290,17 @@ public class AnimalFinderFragment extends Fragment {
                     .into(holder.img);
             Log.e("Loading", String.valueOf(cardData.getImg()));
 
+
+            Log.e("Before", cardData.getTitles()+String.valueOf(cardData.getPostFlag()));
             // 0 means unsolved
-            if (cardData.getPostType()==0){
-                holder.postType.setImageResource(R.drawable.ic_finder_question);
+            if (cardData.getPostFlag()==0){
+
+                Log.e("After 0", String.valueOf(cardData.getPostFlag()));
+                holder.postFlag.setImageResource(R.drawable.ic_finder_question);
             }else{
-                holder.postType.setImageResource(R.drawable.ic_finder_bingo);
+
+                Log.e("After 1", String.valueOf(cardData.getPostFlag()));
+                holder.postFlag.setImageResource(R.drawable.ic_finder_bingo);
             }
         }
 
@@ -309,7 +316,7 @@ public class AnimalFinderFragment extends Fragment {
         // inner class
         class MyViewHolder extends RecyclerView.ViewHolder{
 
-            ImageView img,head,postType;
+            ImageView img,head,postFlag;
             TextView title,username,distance;
             public MyViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -318,7 +325,7 @@ public class AnimalFinderFragment extends Fragment {
                 head=itemView.findViewById(R.id.home_item_head);
                 username=itemView.findViewById(R.id.home_item_username);
                 distance=itemView.findViewById(R.id.home_item_location);
-                postType=itemView.findViewById(R.id.home_item_post_type);
+                postFlag=itemView.findViewById(R.id.home_item_post_flag);
 
                 // click listener
                 itemView.setOnClickListener(new View.OnClickListener() {

@@ -1,6 +1,7 @@
 package com.comp90018.proj2.ui.finder;
 
 import static com.comp90018.proj2.MainActivity.caldistance;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -70,7 +71,7 @@ public class PlantFinderFragment extends Fragment {
     LocationCommunication mLocationCallback;
 
     @Override
-    public void onAttach(Context context){
+    public void onAttach(Context context) {
         super.onAttach(context);
 
         // This makes sure that the container activity has implemented
@@ -199,8 +200,9 @@ public class PlantFinderFragment extends Fragment {
                                                                     .getString("PostImage");
                                                             String postTitle = documentSnapshot
                                                                     .getString("PostTitle");
-                                                            String postId = documentSnapshot
-                                                                    .getString("PostId");
+                                                            String postId = document.getId();
+                                                            String postFlag = documentSnapshot
+                                                                    .getString("PostFlag");
 
                                                             // set data
                                                             CardItem cardItem = new CardItem();
@@ -211,6 +213,7 @@ public class PlantFinderFragment extends Fragment {
                                                             cardItem.setPoint(postGeoPoint);
                                                             cardItem.setPostTime(postTime);
                                                             cardItem.setPostId(postId);
+                                                            cardItem.setPostFlag(Integer.parseInt(postFlag));
 
                                                             cardItemArrayList.add(cardItem);
 
@@ -276,7 +279,8 @@ public class PlantFinderFragment extends Fragment {
 
         /**
          * loading layout, and return MyViewHolder object
-         * @param parent parent view
+         *
+         * @param parent   parent view
          * @param viewType view type
          * @return a view holder
          */
@@ -298,20 +302,20 @@ public class PlantFinderFragment extends Fragment {
             holder.title.setText(cardData.getTitles());
             holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
-            holder.distance.setText(df.format(caldistance(current,cardData.getPoint()))+" km");
+            holder.distance.setText(df.format(caldistance(current, cardData.getPoint())) + " km");
+
+            // 0 means unsolved
+            if (cardData.getPostFlag() == 0) {
+                holder.postFlag.setImageResource(R.drawable.ic_finder_question);
+            } else {
+                holder.postFlag.setImageResource(R.drawable.ic_finder_bingo);
+            }
 
             GlideApp
                     .with(context)
                     .load(cardData.getImg())
                     .centerCrop()
                     .into(holder.img);
-
-            // 0 means unsolved
-            if (cardData.getPostType() == 0) {
-                holder.postType.setImageResource(R.drawable.ic_finder_question);
-            } else {
-                holder.postType.setImageResource(R.drawable.ic_finder_bingo);
-            }
         }
 
         @Override
@@ -324,7 +328,7 @@ public class PlantFinderFragment extends Fragment {
         // inner class
         class MyViewHolder extends RecyclerView.ViewHolder {
 
-            ImageView img, head, postType;
+            ImageView img, head, postFlag;
             TextView title, username, distance;
 
             public MyViewHolder(@NonNull View itemView) {
@@ -334,7 +338,7 @@ public class PlantFinderFragment extends Fragment {
                 head = itemView.findViewById(R.id.home_item_head);
                 username = itemView.findViewById(R.id.home_item_username);
                 distance = itemView.findViewById(R.id.home_item_location);
-                postType = itemView.findViewById(R.id.home_item_post_type);
+                postFlag = itemView.findViewById(R.id.home_item_post_flag);
 
                 // click listener
                 itemView.setOnClickListener(new View.OnClickListener() {
