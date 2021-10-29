@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
     private ActivityMainBinding binding;
     private String TAG = "MainActivity";
 
-
     // get user's current location
     private GeoPoint current;
     private LocationManager lm;
@@ -78,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         // check if come from the Post Location Button
         if(getIntent().getIntExtra("fromLocationToMap",0)==1){
 
+            // if yes, jump to Map fragment
             NavInflater navInflater = navController.getNavInflater();
             NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
             navGraph.setStartDestination(R.id.navigation_dashboard);
@@ -131,13 +132,14 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             Location temp = (lm.getLastKnownLocation(provider));
             current = locationCvtGeo(temp);
         }
-        
-        public void onProviderDisabled(String provider) {
 
+
+        public void onProviderDisabled(String provider) {
             // default location
             current = new GeoPoint(-34, 151);
         }
     };
+
 
     /**
      * In Java, Coordinates data is Location, while Firebase is GeoPoint
@@ -150,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         double lng = location.getLongitude();
         return new GeoPoint(lat, lng);
     }
+
 
     @SuppressLint("WrongConstant")
     public void locationUpdate() {
@@ -171,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 8,mLocationListener);
     }
 
+
     /**
      * Calculate distance through post location and current location
      * @param current current user's location
@@ -190,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         double a = Math.pow(Math.sin(dlat / 2), 2)
                 + Math.cos(lat1) * Math.cos(lat2)
                 * Math.pow(Math.sin(dlon / 2),2);
-
         double c = 2 * Math.asin(Math.sqrt(a));
 
         // Radius of earth in kilometers. Use 3956

@@ -199,6 +199,7 @@ public class PostActivity extends AppCompatActivity {
                         Intent intent1 = new Intent(PostActivity.this, MainActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putInt("fromLocationToMap",1);
+                        bundle.putString("postId",PostKey); // to find corresponding marker
                         intent1.putExtras(bundle);
                         startActivity(intent1);
 
