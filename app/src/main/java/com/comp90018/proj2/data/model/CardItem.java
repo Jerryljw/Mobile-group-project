@@ -15,6 +15,7 @@ public class CardItem {
     private int headsIcon;
     private String usernames;
     private Timestamp postTime;
+
     private String postSpecies;
     private String postType;
 
@@ -57,12 +58,14 @@ public class CardItem {
         this.postId = postId;
     }
 
+
     public int getPostFlag() {
         return postFlag;
     }
 
     public void setPostFlag(int postFlag) {
         this.postFlag = postFlag;
+
     }
 
     public String getUserId() {

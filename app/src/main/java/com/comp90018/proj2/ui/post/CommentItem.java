@@ -1,6 +1,10 @@
 package com.comp90018.proj2.ui.post;
 
 
+
+import android.util.Log;
+
+
 import com.google.firebase.Timestamp;
 
 public class CommentItem {

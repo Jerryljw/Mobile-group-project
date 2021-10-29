@@ -1,5 +1,13 @@
 package com.comp90018.proj2.ui.post;
 
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +18,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.module.AppGlideModule;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.DrawableImageViewTarget;
+import com.bumptech.glide.request.target.Target;
+import com.comp90018.proj2.R;
+import com.comp90018.proj2.MainActivity;
+import com.comp90018.proj2.utils.GlideApp;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,6 +47,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.utils.GlideApp;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -35,14 +64,20 @@ import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
+
+import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Objects;
+
 public class PostActivity extends AppCompatActivity {
     PostItem postItem;
-    ImageView imgPost,imgUserPost;
+    ImageView imgPost,imgUserPost,currentUserHeadicon;
+
     TextView txtPostDesc, txtPostUsername,txtPostTitle;
     EditText editTextComment;
     Button btnAddComment, locatePostButton;
@@ -55,7 +90,11 @@ public class PostActivity extends AppCompatActivity {
     CommentAdapter commentAdapter;
     List<CommentItem> listComment;
     static String COMMENT_KEY = "Comments" ;
+
+    //static String POST_KEY = "Post";
+
     static String POST_KEY = "Post_Temp";
+
     static String COMMENT_CONTENT = "CommentContent";
     static String COMMENT_TIME = "CommentTime";
     static String COMMENT_USERHEADICON = "CommentUserHeadicon";
@@ -79,6 +118,9 @@ public class PostActivity extends AppCompatActivity {
         imgPost =findViewById(R.id.post_img);
         imgUserPost = findViewById(R.id.post_userhead);
 
+        currentUserHeadicon = findViewById(R.id.post_currentuser_img);
+
+
         txtPostTitle = findViewById(R.id.post_title_view);
         txtPostDesc = findViewById(R.id.post_textview);
         txtPostUsername = findViewById(R.id.post_username);
@@ -89,8 +131,10 @@ public class PostActivity extends AppCompatActivity {
         // post id传递
         postItem = new PostItem();
 
+
         PostKey = bundle.getString("postId"); //bundle.get;
         Log.e("PostKey!",PostKey);
+
 
 
         btnAddComment.setOnClickListener(new View.OnClickListener() {
@@ -151,11 +195,13 @@ public class PostActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
                         Intent intent1 = new Intent(PostActivity.this, MainActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putInt("fromLocationToMap",1);
                         intent1.putExtras(bundle);
                         startActivity(intent1);
+
                     }
                 }
         );
@@ -174,6 +220,27 @@ public class PostActivity extends AppCompatActivity {
                     StorageReference gsReference = firebaseStorage
                             .getReferenceFromUrl((String)  dataMap.get("PostImage"));
 
+
+
+
+                    imgUserPost.setImageResource(R.drawable.ic_card_portrait);
+                    //load description
+                    txtPostDesc.setText((String) dataMap.get("PostMessage"));
+
+                     if((dataMap.get("UserDisplayname").equals(""))){
+                        txtPostUsername.setText("User-"+dataMap.get("UserId"));
+                    }
+                    else{
+                        txtPostUsername.setText((String)dataMap.get("UserDisplayname"));
+                    }
+
+
+                    GlideApp.with(getApplication())
+                            .load(String.valueOf(firebaseUser.getPhotoUrl()))
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.ic_card_portrait)
+                                    .fitCenter())
+                            .into(currentUserHeadicon);
                     GlideApp.with(getApplication())
                             .load(gsReference)
                             .centerCrop()
@@ -181,22 +248,6 @@ public class PostActivity extends AppCompatActivity {
                                     .placeholder(R.drawable.ic_card_image)
                                     .fitCenter())
                             .into(imgPost);
-
-                    GlideApp.with(getApplication())
-                            .load(String.valueOf(firebaseUser.getPhotoUrl()))
-                            .apply(new RequestOptions()
-                            .placeholder(R.drawable.ic_card_portrait)
-                            .fitCenter())
-                            .into(imgUserPost);
-                    //load description
-                    txtPostDesc.setText((String) dataMap.get("PostMessage"));
-
-                     if(firebaseUser.getDisplayName().equals("")){
-                        txtPostUsername.setText("User-"+firebaseUser.getUid());
-                    }
-                    else{
-                        txtPostUsername.setText(firebaseUser.getDisplayName());
-                    }
 
                 }
             }
@@ -207,22 +258,12 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
-//        String postImage = bundle.getString("postImage") ;
-//        Glide.with(this).load(postImage).into(imgPost);
-
-//        String postTitle = bundle.getString("title");
-//        txtPostTitle.setText(postTitle);
-//
-//        String userpostImage = bundle.getString("userPhoto");
-//        Glide.with(this).load(userpostImage).into(imgUserPost);
-
-//        String postDescription = bundle.getString("description");
-//        txtPostDesc.setText(postDescription);
 
         RvComment =  findViewById(R.id.comments_recycle_view);
         RvComment.setLayoutManager(new LinearLayoutManager(this));
         // initial Recycle view comments
         iniRvComment();
+
     }
 
     private void iniRvComment() {
@@ -255,6 +296,7 @@ public class PostActivity extends AppCompatActivity {
 
 
     }
+
 
     public void back_onclick(View view)
     {
