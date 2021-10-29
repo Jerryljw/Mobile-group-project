@@ -24,6 +24,8 @@
 
     <!-- Send Post -->
     <string name="prompt_post_type">Post Type</string>
+    <string name="post_type_on">Plant</string>
+    <string name="post_type_off">Animal</string>
     <string name="prompt_post_species">Post Species</string>
     <string name="prompt_post_location">Your Location</string>
     <string name="prompt_post_lon">Longitude</string>
@@ -48,5 +50,6 @@
     <string name="select_icon">Select Icon</string>
     <string name="sign_up">Sign Up</string>
     <string name="display_name">Display Name</string>
+    <string name="post_type">Post Type</string>
 
 </resources>

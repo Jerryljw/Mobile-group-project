@@ -43,6 +43,7 @@ import com.google.firebase.storage.UploadTask;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
+import com.kyleduo.switchbutton.SwitchButton;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -73,11 +74,11 @@ public class SendPostActivity extends AppCompatActivity {
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
     // Fields
     ImageButton newImageButton;
-    EditText textPostLat;
-    EditText textPostLon;
-    EditText textPostType;
-    EditText textPostSpecies;
-    Button sendPostButton;
+    EditText tPostLat;
+    EditText tPostLon;
+    SwitchButton bPostType;
+    EditText tPostSpecies;
+    Button bSendPost;
     ProgressBar loadingProgressBar;
     // Initialize
     private final String TAG = "SendPostActivity";
@@ -123,39 +124,39 @@ public class SendPostActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate: ");
 
         newImageButton = binding.buttonNewImage;
-        textPostLat = binding.textPostLat;
-        textPostLon = binding.textPostLon;
-        textPostType = binding.textPostType;
-        textPostSpecies = binding.textPostSpecies;
-        sendPostButton = binding.sendPost;
+        tPostLat = binding.textPostLat;
+        tPostLon = binding.textPostLon;
+        bPostType = binding.switchPostType;
+        tPostSpecies = binding.textPostSpecies;
+        bSendPost = binding.sendPost;
         loadingProgressBar = binding.loading;
 
 
         // Latitude & Longitude: onChange Validation
         TextWatcher locationTextWatcher = getLocationTextWatcher();
-        textPostLat.addTextChangedListener(locationTextWatcher);
-        textPostLon.addTextChangedListener(locationTextWatcher);
+        tPostLat.addTextChangedListener(locationTextWatcher);
+        tPostLon.addTextChangedListener(locationTextWatcher);
 
 
         // Latitude: add Observer
-        sendPostViewModel.getLatitude().observe(this, textPostLat::setText);
+        sendPostViewModel.getLatitude().observe(this, tPostLat::setText);
 
         // Longitude: add Observer
-        sendPostViewModel.getLongitude().observe(this, textPostLon::setText);
+        sendPostViewModel.getLongitude().observe(this, tPostLon::setText);
 
 
         sendPostViewModel.getSendPostFormState().observe(this, sendPostFormState -> {
             if (sendPostFormState == null) {
                 return;
             }
-            sendPostButton.setEnabled(sendPostFormState.isDataValid());
+            bSendPost.setEnabled(sendPostFormState.isDataValid());
         });
 
-        textPostLon.setEnabled(false);
-        textPostLat.setEnabled(false);
+        tPostLon.setEnabled(false);
+        tPostLat.setEnabled(false);
 
         // sendPostButton: add ClickListener
-        sendPostButton.setOnClickListener(v -> {
+        bSendPost.setOnClickListener(v -> {
             Log.i(TAG, "onClick: ");
             loadingProgressBar.setVisibility(View.VISIBLE);
 
@@ -250,17 +251,19 @@ public class SendPostActivity extends AppCompatActivity {
 
     private void sendPost2Firestore(String imagePath) {
         // Test
-        Map<String, Object> user = new HashMap<>();
-        user.put("PostImage", imagePath);
-        user.put("PostLocation", new GeoPoint(Double.parseDouble(textPostLat.getText().toString()),
-                Double.parseDouble(textPostLon.getText().toString())));
-        user.put("PostSpecies", textPostSpecies.getText().toString());
-        user.put("PostTime", new Timestamp(new Date(System.currentTimeMillis())));
-        user.put("PostType", textPostType.getText().toString());
-        user.put("UserId", mAuth.getUid());
+        Map<String, Object> postDto = new HashMap<>();
+        postDto.put("PostImage", imagePath);
+        postDto.put("PostLocation", new GeoPoint(Double.parseDouble(tPostLat.getText().toString()),
+                Double.parseDouble(tPostLon.getText().toString())));
+        postDto.put("PostSpecies", tPostSpecies.getText().toString());
+        postDto.put("PostTime", new Timestamp(new Date(System.currentTimeMillis())));
+        postDto.put("PostType", bPostType.isChecked() ? getResources().getString(R.string.post_type_on)
+                : getResources().getString(R.string.post_type_off));
+        postDto.put("UserDisplayName", mAuth.getCurrentUser() == null ? "" : mAuth.getCurrentUser().getDisplayName());
+        postDto.put("UserId", mAuth.getUid());
 
         db.collection("Post")
-                .add(user)
+                .add(postDto)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
@@ -372,8 +375,8 @@ public class SendPostActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                sendPostViewModel.locationDataChanged(textPostLat.getText().toString(),
-                        textPostLon.getText().toString());
+                sendPostViewModel.locationDataChanged(tPostLat.getText().toString(),
+                        tPostLon.getText().toString());
             }
         };
 
