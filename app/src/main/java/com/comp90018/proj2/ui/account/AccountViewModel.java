@@ -19,6 +19,7 @@ public class AccountViewModel extends ViewModel {
         if (currentUser != null) {
             String welcome = "Welcome " + currentUser.getEmail() + "\n";
             mText.setValue(welcome + mText.getValue());
+            mText.setValue("Welcome");
         }
     }
 
