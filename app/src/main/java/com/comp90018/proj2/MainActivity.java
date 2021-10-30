@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                R.id.navigation_finder, R.id.navigation_map, R.id.navigation_account)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
 
             NavInflater navInflater = navController.getNavInflater();
             NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
-            navGraph.setStartDestination(R.id.navigation_dashboard);
+            navGraph.setStartDestination(R.id.navigation_map);
             navController.setGraph(navGraph, new Bundle());
         }
 
