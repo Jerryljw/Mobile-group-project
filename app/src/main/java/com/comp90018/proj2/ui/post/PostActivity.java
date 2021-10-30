@@ -159,7 +159,7 @@ public class PostActivity extends AppCompatActivity {
                         uname = firebaseUser.getDisplayName();
                     }
 
-                    String uimg = ""; //firebaseUser.getPhotoUrl().toString();
+                    String uimg = firebaseUser.getPhotoUrl().toString(); //firebaseUser.getPhotoUrl().toString();
 
                     CommentItem comment = new CommentItem(comment_content, uid, uimg, uname);
                     Map<String, Object> data = new HashMap<>();
