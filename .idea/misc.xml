@@ -3,6 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_login.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_main.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_middle.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_post.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_post_obs.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_send_post.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_sign_up.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/camera.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/carditem.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/comment_layout.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/fragment_account.xml" value="0.21739130434782608" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/fragment_find.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/fragment_finder.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/fragment_finder_animal.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/fragment_finder_plant.xml" value="0.215625" />
+        <entry key="..\:/Mobile-group-project/app/src/main/res/layout/fragment_map.xml" value="0.215625" />
         <entry key="..\:/Work_Study/Unimelb/2021S2/90018Mobile/repo1/Mobile-group-project/app/src/main/res/layout/activity_login.xml" value="0.13177083333333334" />
         <entry key="..\:/Work_Study/Unimelb/2021S2/90018Mobile/repo1/Mobile-group-project/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Work_Study/Unimelb/2021S2/90018Mobile/repo1/Mobile-group-project/app/src/main/res/layout/activity_post.xml" value="0.4033613316075515" />
@@ -18,7 +34,7 @@
     </option>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

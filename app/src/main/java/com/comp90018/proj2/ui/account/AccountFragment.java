@@ -18,6 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.comp90018.proj2.databinding.FragmentAccountBinding;
 import com.comp90018.proj2.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class AccountFragment extends Fragment {
 
@@ -45,17 +47,20 @@ public class AccountFragment extends Fragment {
         phoneTxtView = binding.phoneTextview;
         videoTxtView = binding.videoTextview;
         facebookTxtView = binding.facebookTextview;
-        twitterTxtView = binding.twitterTextview;
+//        twitterTxtView = binding.twitterTextview;
 
         userImageView = binding.userImageview;
         emailImageView = binding.emailImageview;
         phoneImageView = binding.phoneImageview;
         videoImageView = binding.videoImageview;
         facebookImageView = binding.facebookImageview;
-        twitterImageView = binding.twitterImageview;
+//        twitterImageView = binding.twitterImageview;
 
-        emailTxtView.setText("email");
-        occupationTxtView.setText("profession");
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        emailTxtView.setText(currentUser.getEmail());
+        occupationTxtView.setText("occupation");
         workTxtView.setText("workplace");
         phoneTxtView.setText("phone");
         videoTxtView.setText("phone");
