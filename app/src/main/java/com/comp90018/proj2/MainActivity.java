@@ -22,6 +22,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.comp90018.proj2.databinding.ActivityMainBinding;
+import com.comp90018.proj2.utils.GeoPointUtils;
 import com.comp90018.proj2.utils.LocationCommunication;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.GeoPoint;
@@ -36,12 +37,12 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
 
     // get user's current location
     private GeoPoint current;
-    private LocationManager lm;
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationUpdate();
 
 
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                R.id.navigation_finder, R.id.navigation_map, R.id.navigation_account)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 
@@ -63,8 +64,9 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
 
             NavInflater navInflater = navController.getNavInflater();
             NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
-            navGraph.setStartDestination(R.id.navigation_dashboard);
-            navController.setGraph(navGraph, new Bundle());
+            navGraph.setStartDestination(R.id.navigation_map);
+            Log.d(TAG, "onCreate: bundle" + getIntent().getExtras());
+            navController.setGraph(navGraph, getIntent().getExtras());
         }
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
     private LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(@NonNull Location location) {
-            current = locationCvtGeo(location);
+            current = GeoPointUtils.locationCvtGeo(location);
         }
 
         @SuppressLint("WrongConstant")
@@ -101,8 +103,8 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             }
 
             // When GPS LocationProvider is on, update current location with real data
-            Location temp = (lm.getLastKnownLocation(provider));
-            current = locationCvtGeo(temp);
+            Location temp = (locationManager.getLastKnownLocation(provider));
+            current = GeoPointUtils.locationCvtGeo(temp);
         }
         
         public void onProviderDisabled(String provider) {
@@ -111,18 +113,6 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             current = new GeoPoint(-34, 151);
         }
     };
-
-    /**
-     * In Java, Coordinates data is Location, while Firebase is GeoPoint
-     * @param location java data type
-     * @return current location in GeoPoint
-     */
-    public GeoPoint locationCvtGeo(Location location){
-        double lat = location.getLatitude();
-        // Log.e("convert", String.valueOf(lat));
-        double lng = location.getLongitude();
-        return new GeoPoint(lat, lng);
-    }
 
     @SuppressLint("WrongConstant")
     public void locationUpdate() {
@@ -136,42 +126,12 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             return;
         }
 
-        Location location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        current = locationCvtGeo(location);
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        current = GeoPointUtils.locationCvtGeo(location);
         // Log.e("current location", String.valueOf(current));
 
         // For every 2s, update user's location
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 8,mLocationListener);
-    }
-
-    /**
-     * Calculate distance through post location and current location
-     * @param current current user's location
-     * @param postPoint post location
-     * @return the distance in km
-     */
-    static public double caldistance(GeoPoint current, GeoPoint postPoint)
-    {
-        double lon1 = Math.toRadians(current.getLongitude());
-        double lon2 = Math.toRadians(postPoint.getLongitude());
-        double lat1 = Math.toRadians(current.getLatitude());
-        double lat2 = Math.toRadians(postPoint.getLatitude());
-
-        // Haversine formula
-        double dlon = lon2 - lon1;
-        double dlat = lat2 - lat1;
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.pow(Math.sin(dlon / 2),2);
-
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        // Radius of earth in kilometers. Use 3956
-        // for miles
-        double r = 6371;
-
-        // calculate the result
-        return (c * r);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 8,mLocationListener);
     }
 
 
