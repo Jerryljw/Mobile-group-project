@@ -1,8 +1,6 @@
 package com.comp90018.proj2.ui.finder;
 
 
-import static com.comp90018.proj2.MainActivity.caldistance;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,10 +20,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.data.model.CardItem;
 import com.comp90018.proj2.ui.post.PostActivity;
+import com.comp90018.proj2.utils.GeoPointUtils;
 import com.comp90018.proj2.utils.GlideApp;
 import com.comp90018.proj2.utils.LocationCommunication;
 import com.comp90018.proj2.utils.PostLocSort;
@@ -41,8 +39,6 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.type.DateTime;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -109,13 +105,12 @@ public class AnimalFinderFragment extends Fragment {
                 if (sp_item.equalsIgnoreCase("Latest Post Time")) {
                     PostTimeSort postTimeSort = new PostTimeSort();
                     Collections.sort(cardItemArrayList, postTimeSort);
-                    initRecycleView();
                 } else {
                     Log.e("Animal","Nearest");
                     PostLocSort postLocSort = new PostLocSort(current);
                     Collections.sort(cardItemArrayList, postLocSort);
-                    initRecycleView();
                 }
+                initRecycleView();
             }
 
             @Override
@@ -283,7 +278,7 @@ public class AnimalFinderFragment extends Fragment {
             holder.title.setText(cardData.getTitles());
             holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
-            holder.distance.setText(df.format(caldistance(current,cardData.getPoint()))+" km");
+            holder.distance.setText(df.format(GeoPointUtils.calDistance(current, cardData.getPoint())) + " km");
             GlideApp
                     .with(context)
                     .load(cardData.getImg())
@@ -323,7 +318,7 @@ public class AnimalFinderFragment extends Fragment {
                 super(itemView);
                 img=itemView.findViewById(R.id.home_item_img);
                 title=itemView.findViewById(R.id.home_item_title);
-                head=itemView.findViewById(R.id.home_item_head);
+                head=itemView.findViewById(R.id.home_item_user_img);
                 username=itemView.findViewById(R.id.home_item_username);
                 distance=itemView.findViewById(R.id.home_item_location);
                 postFlag=itemView.findViewById(R.id.home_item_post_flag);

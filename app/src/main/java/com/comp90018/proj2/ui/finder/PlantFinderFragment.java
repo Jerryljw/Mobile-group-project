@@ -1,6 +1,5 @@
 package com.comp90018.proj2.ui.finder;
 
-import static com.comp90018.proj2.MainActivity.caldistance;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.data.model.CardItem;
 import com.comp90018.proj2.ui.post.PostActivity;
+import com.comp90018.proj2.utils.GeoPointUtils;
 import com.comp90018.proj2.utils.GlideApp;
 import com.comp90018.proj2.utils.LocationCommunication;
 import com.comp90018.proj2.utils.PostLocSort;
@@ -304,8 +304,7 @@ public class PlantFinderFragment extends Fragment {
             holder.title.setText(cardData.getTitles());
             holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
-            holder.distance.setText(df.format(caldistance(current, cardData.getPoint())) + " km");
-
+            holder.distance.setText(df.format(GeoPointUtils.calDistance(current, cardData.getPoint())) + " km");
             // 0 means unsolved
             if (cardData.getPostFlag() == 0) {
                 holder.postFlag.setImageResource(R.drawable.ic_finder_question);
@@ -337,7 +336,7 @@ public class PlantFinderFragment extends Fragment {
                 super(itemView);
                 img = itemView.findViewById(R.id.home_item_img);
                 title = itemView.findViewById(R.id.home_item_title);
-                head = itemView.findViewById(R.id.home_item_head);
+                head = itemView.findViewById(R.id.home_item_user_img);
                 username = itemView.findViewById(R.id.home_item_username);
                 distance = itemView.findViewById(R.id.home_item_location);
                 postFlag = itemView.findViewById(R.id.home_item_post_flag);

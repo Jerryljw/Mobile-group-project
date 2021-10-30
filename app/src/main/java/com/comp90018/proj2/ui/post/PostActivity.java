@@ -61,6 +61,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -81,6 +82,7 @@ import java.util.Objects;
 public class PostActivity extends AppCompatActivity {
     PostItem postItem;
     ImageView imgPost,imgUserPost,currentUserHeadicon;
+    GeoPoint postLocation;
 
     TextView txtPostDesc, txtPostUsername,txtPostTitle;
     EditText editTextComment;
@@ -202,7 +204,10 @@ public class PostActivity extends AppCompatActivity {
 
                         Intent intent1 = new Intent(PostActivity.this, MainActivity.class);
                         Bundle bundle = new Bundle();
-                        bundle.putInt("fromLocationToMap",1);
+                        bundle.putInt("fromLocationToMap", 1);
+                        Log.d("TAGaaaaa", "onClick: " + postLocation);
+                        bundle.putDouble("latitude", postLocation.getLatitude());
+                        bundle.putDouble("longitude", postLocation.getLongitude());
                         intent1.putExtras(bundle);
                         startActivity(intent1);
 
@@ -225,7 +230,7 @@ public class PostActivity extends AppCompatActivity {
                             .getReferenceFromUrl((String)  dataMap.get("PostImage"));
 
 
-
+                    postLocation = documentSnapshot.getGeoPoint("PostLocation");
 
                     imgUserPost.setImageResource(R.drawable.ic_card_portrait);
                     //load description
@@ -237,7 +242,6 @@ public class PostActivity extends AppCompatActivity {
                     else{
                         txtPostUsername.setText((String)dataMap.get("UserDisplayname"));
                     }
-
 
                     GlideApp.with(getApplication())
                             .load(String.valueOf(firebaseUser.getPhotoUrl()))
@@ -308,4 +312,6 @@ public class PostActivity extends AppCompatActivity {
         intent.setClass(PostActivity.this, MainActivity.class);
         PostActivity.this.startActivity(intent);
     }
+
+
 }

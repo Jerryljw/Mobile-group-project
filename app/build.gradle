@@ -2,7 +2,6 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
-    id 'com.jakewharton.butterknife'
 }
 
 android {
@@ -75,9 +74,6 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     implementation 'androidx.camera:camera-view:1.0.0-alpha27'
 
-    /** ButterKnife **/
-    implementation 'com.jakewharton:butterknife:10.1.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 
     /** EasyPhoto **/
     implementation 'com.github.HuanTanSheng:EasyPhotos:3.1.4'

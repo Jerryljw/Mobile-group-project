@@ -3,22 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_finder">
 
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_finder"
         android:name="com.comp90018.proj2.ui.finder.FinderFragment"
         android:label="@string/title_find"
-        tools:layout="@layout/fragment_find" />
+        tools:layout="@layout/fragment_finder" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_map"
         android:name="com.comp90018.proj2.ui.map.MapFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map">
+<!--        <argument-->
+<!--            android:name="latitude"-->
+<!--            app:nullable="true" />-->
+<!--        <argument-->
+<!--            android:name="longitude"-->
+<!--            app:nullable="true" />-->
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_account"
         android:name="com.comp90018.proj2.ui.account.AccountFragment"
         android:label="@string/title_account"
         tools:layout="@layout/fragment_account" />

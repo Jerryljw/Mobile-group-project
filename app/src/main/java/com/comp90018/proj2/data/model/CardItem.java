@@ -18,6 +18,15 @@ public class CardItem {
 
     private String postSpecies;
     private String postType;
+    private String postMessage;
+
+    public String getPostMessage() {
+        return postMessage;
+    }
+
+    public void setPostMessage(String postMessage) {
+        this.postMessage = postMessage;
+    }
 
     public String getPostSpecies() {
         return postSpecies;
@@ -116,5 +125,21 @@ public class CardItem {
         this.usernames = usernames;
     }
 
-
+    @Override
+    public String toString() {
+        return "CardItem{" +
+                "userId='" + userId + '\'' +
+                ", postId='" + postId + '\'' +
+                ", img=" + img +
+                ", titles='" + titles + '\'' +
+                ", headsIcon=" + headsIcon +
+                ", usernames='" + usernames + '\'' +
+                ", postTime=" + postTime +
+                ", postSpecies='" + postSpecies + '\'' +
+                ", postType='" + postType + '\'' +
+                ", postMessage='" + postMessage + '\'' +
+                ", postFlag=" + postFlag +
+                ", point=" + point +
+                '}';
+    }
 }
