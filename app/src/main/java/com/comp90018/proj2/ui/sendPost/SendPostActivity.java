@@ -76,6 +76,8 @@ public class SendPostActivity extends AppCompatActivity {
     ImageButton newImageButton;
     EditText tPostLat;
     EditText tPostLon;
+    EditText tPostTitle;
+    EditText tPostMessage;
     SwitchButton bPostType;
     EditText tPostSpecies;
     Button bSendPost;
@@ -126,16 +128,19 @@ public class SendPostActivity extends AppCompatActivity {
         newImageButton = binding.buttonNewImage;
         tPostLat = binding.textPostLat;
         tPostLon = binding.textPostLon;
-        bPostType = binding.switchPostType;
+        tPostTitle = binding.textPostTitle;
+        tPostMessage = binding.textPostMessage;
         tPostSpecies = binding.textPostSpecies;
+        bPostType = binding.switchPostType;
         bSendPost = binding.sendPost;
         loadingProgressBar = binding.loading;
 
 
         // Latitude & Longitude: onChange Validation
         TextWatcher locationTextWatcher = getLocationTextWatcher();
-        tPostLat.addTextChangedListener(locationTextWatcher);
-        tPostLon.addTextChangedListener(locationTextWatcher);
+        tPostTitle.addTextChangedListener(locationTextWatcher);
+        tPostMessage.addTextChangedListener(locationTextWatcher);
+        tPostSpecies.addTextChangedListener(locationTextWatcher);
 
 
         // Latitude: add Observer
@@ -149,7 +154,17 @@ public class SendPostActivity extends AppCompatActivity {
             if (sendPostFormState == null) {
                 return;
             }
+
             bSendPost.setEnabled(sendPostFormState.isDataValid());
+            if (sendPostFormState.getImageError() != null) {
+                tPostTitle.setError(getString(sendPostFormState.getImageError()));
+            }
+            if (sendPostFormState.getTitleError() != null) {
+                tPostTitle.setError(getString(sendPostFormState.getTitleError()));
+            }
+            if (sendPostFormState.getMessageError() != null) {
+                tPostMessage.setError(getString(sendPostFormState.getMessageError()));
+            }
         });
 
         tPostLon.setEnabled(false);
@@ -162,8 +177,8 @@ public class SendPostActivity extends AppCompatActivity {
 
             // Check image selected.
             if (currentFilePath == null || "".equals(currentFilePath)) {
-                sendPostViewModel.getSendPostFormState().setValue(
-                        new SendPostFormState(R.string.invalid_post_image));
+//                sendPostViewModel.getSendPostFormState().setValue(
+//                        new SendPostFormState(R.string.invalid_post_image));
                 return;
             }
             // [START send post]
@@ -253,6 +268,8 @@ public class SendPostActivity extends AppCompatActivity {
         // Test
         Map<String, Object> postDto = new HashMap<>();
         postDto.put("PostImage", imagePath);
+        postDto.put("PostTitle", tPostTitle.getText().toString());
+        postDto.put("PostMessage", tPostMessage.getText().toString());
         postDto.put("PostLocation", new GeoPoint(Double.parseDouble(tPostLat.getText().toString()),
                 Double.parseDouble(tPostLon.getText().toString())));
         postDto.put("PostSpecies", tPostSpecies.getText().toString());
@@ -375,8 +392,8 @@ public class SendPostActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                sendPostViewModel.locationDataChanged(tPostLat.getText().toString(),
-                        tPostLon.getText().toString());
+                sendPostViewModel.formDataChanged(currentFilePath,
+                        tPostTitle.getText().toString(), tPostMessage.getText().toString());
             }
         };
 

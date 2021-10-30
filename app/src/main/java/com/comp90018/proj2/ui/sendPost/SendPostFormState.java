@@ -7,25 +7,21 @@ public class SendPostFormState {
     @Nullable
     private Integer imageError;
     @Nullable
-    private Integer longitudeError;
+    private Integer titleError;
     @Nullable
-    private Integer latitudeError;
+    private Integer messageError;
     private boolean isDataValid = true;
 
-    SendPostFormState(@Nullable Integer imageError) {
+    public SendPostFormState(@Nullable Integer imageError, @Nullable Integer titleError, @Nullable Integer messageError) {
         this.imageError = imageError;
-        this.isDataValid = false;
-    }
-
-    SendPostFormState(@Nullable Integer longitudeError, @Nullable Integer latitudeError) {
-        this.longitudeError = longitudeError;
-        this.latitudeError = latitudeError;
-        this.isDataValid = false;
+        this.titleError = titleError;
+        this.messageError = messageError;
     }
 
     SendPostFormState(boolean isDataValid) {
-        this.longitudeError = null;
-        this.latitudeError = null;
+        this.imageError = null;
+        this.titleError = null;
+        this.messageError = null;
         this.isDataValid = isDataValid;
     }
 
@@ -34,18 +30,14 @@ public class SendPostFormState {
         return imageError;
     }
 
-    public void setImageError(@Nullable Integer imageError) {
-        this.imageError = imageError;
+    @Nullable
+    public Integer getTitleError() {
+        return titleError;
     }
 
     @Nullable
-    public Integer getLongitudeError() {
-        return longitudeError;
-    }
-
-    @Nullable
-    public Integer getLatitudeError() {
-        return latitudeError;
+    public Integer getMessageError() {
+        return messageError;
     }
 
     boolean isDataValid() {
