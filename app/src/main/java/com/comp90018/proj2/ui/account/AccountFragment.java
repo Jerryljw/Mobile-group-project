@@ -11,12 +11,16 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.request.RequestOptions;
+import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.FragmentAccountBinding;
 import com.comp90018.proj2.ui.login.LoginActivity;
+import com.comp90018.proj2.utils.GlideApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -59,11 +63,23 @@ public class AccountFragment extends Fragment {
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        String Name = currentUser.getDisplayName();
+        if (Name.equals("")){
+            Name = "Default Name";
+        }
         emailTxtView.setText(currentUser.getEmail());
-        occupationTxtView.setText("occupation");
-        workTxtView.setText("workplace");
+        occupationTxtView.setText(currentUser.getUid());
+        workTxtView.setText(Name);
         phoneTxtView.setText("phone");
-        videoTxtView.setText("phone");
+        videoTxtView.setText("Country");
+
+
+        GlideApp.with(this)
+                .load(String.valueOf(mAuth.getCurrentUser().getPhotoUrl()))
+                .apply(new RequestOptions()
+                        .placeholder(R.drawable.ic_card_portrait)
+                        .fitCenter())
+                .into(userImageView);
 
         accountViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
