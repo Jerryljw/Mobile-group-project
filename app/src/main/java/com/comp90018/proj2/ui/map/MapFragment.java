@@ -112,11 +112,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
         if (getArguments() != null) {
             Bundle arguments = getArguments();
+            Log.d(TAG, "onCreateView: bundle: " + arguments);
             double latitude = arguments.getDouble("latitude");
             double longitude = arguments.getDouble("longitude");
             latLngFromPostActivity = new LatLng(latitude, longitude);
             Log.d(TAG, "onCreateView: latlng from activity" + latLngFromPostActivity);
-            Log.d(TAG, "onCreateView: ");
+
         }
 
         // Menu
