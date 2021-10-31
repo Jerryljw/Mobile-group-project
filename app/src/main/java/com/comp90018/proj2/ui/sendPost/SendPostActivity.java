@@ -268,6 +268,7 @@ public class SendPostActivity extends AppCompatActivity {
         // Test
         Map<String, Object> postDto = new HashMap<>();
         postDto.put("PostImage", imagePath);
+        postDto.put("PostFlag", 0);
         postDto.put("PostTitle", tPostTitle.getText().toString());
         postDto.put("PostMessage", tPostMessage.getText().toString());
         postDto.put("PostLocation", new GeoPoint(Double.parseDouble(tPostLat.getText().toString()),
@@ -277,8 +278,9 @@ public class SendPostActivity extends AppCompatActivity {
         postDto.put("PostType", bPostType.isChecked() ? getResources().getString(R.string.post_type_on)
                 : getResources().getString(R.string.post_type_off));
         postDto.put("UserDisplayName", mAuth.getCurrentUser() == null ? "" : mAuth.getCurrentUser().getDisplayName());
+        postDto.put("UserPhotoUri", mAuth.getCurrentUser() == null ? "" : mAuth.getCurrentUser().getPhotoUrl());
         postDto.put("UserId", mAuth.getUid());
-
+        
         db.collection("Post")
                 .add(postDto)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
