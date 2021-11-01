@@ -253,7 +253,7 @@ public class AccountFragment extends Fragment {
                             Log.i(TAG, "profileUpdates: succeed");
                             Log.i(TAG, "Display Name = " + user.getDisplayName());
                             Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
-                            Toast.makeText(getActivity().getApplicationContext(), "User Profile Updated Successes!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "User Profile Updated Successes!!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
