@@ -28,9 +28,8 @@
             android:layout_marginTop="60dp"
             android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif-condensed-medium"
-            android:text="Amanda Burque"
+            android:text="Welcome"
             android:textAlignment="center"
-            android:textColor="@color/black"
             android:textSize="25sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
@@ -39,7 +38,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/user_imageview"
         android:layout_width="126dp"
         android:layout_height="109dp"
@@ -86,26 +85,42 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:clickable="true"
-                android:text="Marine Biologist"
+                android:text="Name"
                 android:layout_gravity="center_horizontal"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/workplace_textview"
+            <LinearLayout
+                android:id="@+id/nameLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_gravity="center_horizontal"
-                android:text="Key Biscaine National Park"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.497"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/occupation_textview" />
+                android:layout_gravity="center_horizontal">
+
+                <EditText
+                    android:id="@+id/displayName_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="0dp"
+                    android:text="Key Biscaine National Park"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nameLayout" />
+
+                <ImageView
+                    android:id="@+id/nameImageView"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintStart_toEndOf="@+id/workplace_textview"
+                    app:layout_constraintTop_toBottomOf="@+id/nameLayout"
+                    app:srcCompat="@drawable/ic_baseline_edit_24" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayout"
@@ -139,13 +154,26 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="abozquet@biscainepark.org"
+                    android:layout_marginEnd="0dp"
+                    android:text="xxxxxx@xxxxxxxxxx.com"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.031"
+                    app:layout_constraintHorizontal_bias="0.126"
                     app:layout_constraintStart_toEndOf="@+id/email_imageview"
                     app:layout_constraintTop_toBottomOf="@+id/workplace_textview" />
+
+                <ImageView
+                    android:id="@+id/editImageView"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/email_textview"
+                    app:layout_constraintHorizontal_bias="0.031"
+                    app:layout_constraintTop_toBottomOf="@+id/workplace_textview"
+                    app:srcCompat="@drawable/ic_baseline_edit_24" />
 
             </LinearLayout>
 
@@ -329,7 +357,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
 
                 <Button
-                    android:id="@+id/post_his"
+                    android:id="@+id/update"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
@@ -338,7 +366,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="0dp"
                     android:enabled="true"
-                    android:text="Check My Post History"
+                    android:text="Update Profile"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:ignore="MissingConstraints"
                     tools:layout_editor_absoluteX="129dp" />
