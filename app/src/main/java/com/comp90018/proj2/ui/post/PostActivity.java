@@ -96,6 +96,8 @@ public class PostActivity extends AppCompatActivity {
     CommentAdapter commentAdapter;
     List<CommentItem> listComment;
     static String COMMENT_KEY = "Comments" ;
+    private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
+
 
 
     //static String POST_KEY = "Post";
@@ -228,20 +230,19 @@ public class PostActivity extends AppCompatActivity {
                     //load image
                     Log.d("TAG", "onSuccess: " + dataMap.get("PostImage"));
                     StorageReference gsReference = firebaseStorage
-                            .getReferenceFromUrl((String)  dataMap.get("PostImage"));
+                            .getReferenceFromUrl(PREFIX+(String)  dataMap.get("PostImage"));
 
 
                     postLocation = documentSnapshot.getGeoPoint("PostLocation");
 
-                    imgUserPost.setImageResource(R.drawable.ic_card_portrait);
                     //load description
                     txtPostDesc.setText((String) dataMap.get("PostMessage"));
 
-                     if((dataMap.get("UserDisplayname").equals(""))){
+                     if((dataMap.get("UserDisplayName").equals(""))){
                         txtPostUsername.setText("User-"+dataMap.get("UserId"));
                     }
                     else{
-                        txtPostUsername.setText((String)dataMap.get("UserDisplayname"));
+                        txtPostUsername.setText((String)dataMap.get("UserDisplayName"));
                     }
 
                     GlideApp.with(getApplication())
@@ -250,6 +251,7 @@ public class PostActivity extends AppCompatActivity {
                                     .placeholder(R.drawable.ic_card_portrait)
                                     .fitCenter())
                             .into(currentUserHeadicon);
+
                     GlideApp.with(getApplication())
                             .load(gsReference)
                             .centerCrop()
@@ -257,6 +259,15 @@ public class PostActivity extends AppCompatActivity {
                                     .placeholder(R.drawable.ic_card_image)
                                     .fitCenter())
                             .into(imgPost);
+
+                    gsReference = firebaseStorage
+                            .getReferenceFromUrl((String)  dataMap.get("UserPhotoUri"));
+                    GlideApp.with(getApplication())
+                            .load(gsReference)
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.ic_card_portrait)
+                                    .fitCenter())
+                            .into(imgUserPost);
 
                 }
             }
@@ -296,7 +307,7 @@ public class PostActivity extends AppCompatActivity {
                 }
                 if(listComment.toArray().length>0){
                     firebaseFirestore.collection(POST_KEY).document(PostKey)
-                            .update("PostFlag","1")
+                            .update("PostFlag",1)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -312,7 +323,7 @@ public class PostActivity extends AppCompatActivity {
                 }
                 else {
                     firebaseFirestore.collection(POST_KEY).document(PostKey)
-                            .update("PostFlag","0")
+                            .update("PostFlag",0)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
