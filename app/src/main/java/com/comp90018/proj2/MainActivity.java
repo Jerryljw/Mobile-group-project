@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             return;
         }
 
-        Location location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location == null) {
             current = new GeoPoint(-34, 151);
         } else {
