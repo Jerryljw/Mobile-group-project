@@ -80,6 +80,7 @@ public class SendPostActivity extends AppCompatActivity {
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
     // Fields
     ImageButton newImageButton;
+    ImageButton bUpdateLocation;
     EditText tPostLat;
     EditText tPostLon;
     EditText tPostTitle;
@@ -132,6 +133,7 @@ public class SendPostActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate: ");
 
         newImageButton = binding.buttonNewImage;
+        bUpdateLocation = binding.buttonUpdateLocation;
         tPostLat = binding.textPostLat;
         tPostLon = binding.textPostLon;
         tPostTitle = binding.textPostTitle;
@@ -203,6 +205,10 @@ public class SendPostActivity extends AppCompatActivity {
             // [START select image]
             selectImage();
             // [END select image]
+        });
+
+        bUpdateLocation.setOnClickListener(v -> {
+            getDeviceLocation();
         });
     }
 
