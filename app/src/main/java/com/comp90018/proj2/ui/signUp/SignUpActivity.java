@@ -155,7 +155,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    private void saveIcon() {
+    private void saveIcon(String userId) {
         String[] filename =  currIconPath.split("\\.");
         BitmapFactory.Options opts = new BitmapFactory.Options();
         Bitmap bm = BitmapFactory.decodeFile(currIconPath, opts);
@@ -164,7 +164,7 @@ public class SignUpActivity extends AppCompatActivity {
         byte[] data = baos.toByteArray();
 
         // Upload image
-        String uuid = UUID.randomUUID().toString() + "-" + Calendar.getInstance().getTimeInMillis();
+        String uuid = "".equals(userId) ? UUID.randomUUID().toString() : userId;
         StorageReference uploadRef = storageRef.child("icons/" + uuid + "." + filename[filename.length - 1]);
         UploadTask uploadTask = uploadRef.putBytes(data);
 
@@ -231,8 +231,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 Log.i(TAG, "Expected Uri = " + iconUri);
 
                                 if (currIconPath != null && !"".equals(currIconPath)) {
-                                    saveIcon();
-
+                                    saveIcon(user.getUid());
                                 } else {
                                     updateUserProfile(Uri.parse("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com/" +
                                             "o/icons%2Fvecteezypeople-business-avatarpp0421_generated.jpg?alt=media" +

@@ -278,7 +278,8 @@ public class SendPostActivity extends AppCompatActivity {
         postDto.put("PostType", bPostType.isChecked() ? getResources().getString(R.string.post_type_on)
                 : getResources().getString(R.string.post_type_off));
         postDto.put("UserDisplayName", mAuth.getCurrentUser() == null ? "" : mAuth.getCurrentUser().getDisplayName());
-        postDto.put("UserPhotoUri", mAuth.getCurrentUser() == null ? "" : mAuth.getCurrentUser().getPhotoUrl());
+        postDto.put("UserPhotoUri", (mAuth.getCurrentUser() == null || mAuth.getCurrentUser().getPhotoUrl() == null) ?
+                "" : mAuth.getCurrentUser().getPhotoUrl().toString());
         postDto.put("UserId", mAuth.getUid());
         
         db.collection("Post")
