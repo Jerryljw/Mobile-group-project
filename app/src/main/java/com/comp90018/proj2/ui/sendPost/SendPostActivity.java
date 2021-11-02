@@ -1,6 +1,7 @@
 package com.comp90018.proj2.ui.sendPost;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,15 +19,19 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySendPostBinding;
 import com.comp90018.proj2.ui.photo.GlideEngine;
+import com.comp90018.proj2.ui.post.PostActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -57,6 +63,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class SendPostActivity extends AppCompatActivity {
@@ -115,8 +122,36 @@ public class SendPostActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent1 = new Intent(SendPostActivity.this, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("fromLocationToMap", 1);
+        intent1.putExtras(bundle);
+        double latitude = sendPostViewModel.getLatitude().getValue() == null ?
+                -34 : Double.parseDouble(sendPostViewModel.getLatitude().getValue());
+        double longitude = sendPostViewModel.getLongitude().getValue() == null ?
+                151 : Double.parseDouble(sendPostViewModel.getLongitude().getValue());
+
+        bundle.putDouble("latitude", latitude);
+        bundle.putDouble("longitude", longitude);
+        intent1.putExtras(bundle);
+        startActivity(intent1);
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar supportActionBar = getSupportActionBar();
+        Objects.requireNonNull(supportActionBar).setDisplayHomeAsUpEnabled(true);
+//        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+//            @Override
+//            public void handleOnBackPressed() {
+//
+//            }
+//        };
+//        getOnBackPressedDispatcher().addCallback(this, callback);
+
 
         binding = ActivitySendPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
