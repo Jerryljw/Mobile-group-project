@@ -36,17 +36,15 @@
     <string name="invalid_message">Not a valid Post Message.</string>
 
 
-
     <!-- Find -->
     <string-array name="spingarr">
         <item>Latest Post Time</item>
         <item>Nearest Post Location</item>
     </string-array>
-  
+
     <string name="error_upload_image">Error happened when uploading image. Please try again.</string>
     <string name="success_send_post">Your post has been received!</string>
     <string name="error_label">We cannot recognize your image. Please upload Plants or Animals.</string>
-
 
 
     <!--    Permissions    -->

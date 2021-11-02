@@ -3,6 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/activity_post.xml" value="0.21354166666666666" />
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/activity_post_obs.xml" value="0.21354166666666666" />
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/activity_send_post.xml" value="0.36614583333333334" />
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/comment_layout.xml" value="0.21354166666666666" />
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/fragment_account.xml" value="0.2653985507246377" />
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/fragment_finder.xml" value="0.21354166666666666" />
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/fragment_finder_animal.xml" value="0.21354166666666666" />
+        <entry key="..\:/AndroidStudioProjects/Mobile-group-project/app/src/main/res/layout/fragment_finder_plant.xml" value="0.21354166666666666" />
         <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_login.xml" value="0.215625" />
         <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_main.xml" value="0.215625" />
         <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_middle.xml" value="0.215625" />
