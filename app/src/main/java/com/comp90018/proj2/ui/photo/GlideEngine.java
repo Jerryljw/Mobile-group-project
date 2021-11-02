@@ -13,18 +13,18 @@ import com.huantansheng.easyphotos.engine.ImageEngine;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 /**
- * Glide4.x的加载图片引擎实现,单例模式
- * Glide4.x的缓存机制更加智能，已经达到无需配置的境界。如果使用Glide3.x，需要考虑缓存机制。
+ * Glide's loading image engine implementation, singleton mode, EasyPhoto's image display based on this engine.
+ * The Engine is taken from EasyPhoto's documentation
  * Created by huan on 2018/1/15.
  */
 
 public class GlideEngine implements ImageEngine {
-    //单例
+    //singleton
     private static GlideEngine instance = null;
-    //单例模式，私有构造方法
+    //private constructor
     private GlideEngine() {
     }
-    //获取单例
+    //get the singleton
     public static GlideEngine getInstance() {
         if (null == instance) {
             synchronized (GlideEngine.class) {
@@ -37,43 +37,26 @@ public class GlideEngine implements ImageEngine {
     }
 
     /**
-     * 加载图片到ImageView
+     * load photos into ImageView
      *
-     * @param context   上下文
-     * @param uri 图片路径Uri
-     * @param imageView 加载到的ImageView
      */
-    //安卓10推荐uri，并且path的方式不再可用
     @Override
     public void loadPhoto(@NonNull Context context, @NonNull Uri uri, @NonNull ImageView imageView) {
         Glide.with(context).load(uri).transition(withCrossFade()).into(imageView);
     }
 
     /**
-     * 加载gif动图图片到ImageView，gif动图不动
-     *
-     * @param context   上下文
-     * @param gifUri   gif动图路径Uri
-     * @param imageView 加载到的ImageView
-     *                  <p>
-     *                  备注：不支持动图显示的情况下可以不写
+     * load gif photos into ImageView with no animation.
      */
-    //安卓10推荐uri，并且path的方式不再可用
     @Override
     public void loadGifAsBitmap(@NonNull Context context, @NonNull Uri gifUri, @NonNull ImageView imageView) {
         Glide.with(context).asBitmap().load(gifUri).into(imageView);
     }
 
     /**
-     * 加载gif动图到ImageView，gif动图动
+     * load gif photos into ImageView with animation.
      *
-     * @param context   上下文
-     * @param gifUri   gif动图路径Uri
-     * @param imageView 加载动图的ImageView
-     *                  <p>
-     *                  备注：不支持动图显示的情况下可以不写
      */
-    //安卓10推荐uri，并且path的方式不再可用
     @Override
     public void loadGif(@NonNull Context context, @NonNull Uri gifUri, @NonNull ImageView imageView) {
         Glide.with(context).asGif().load(gifUri).transition(withCrossFade()).into(imageView);
@@ -81,16 +64,8 @@ public class GlideEngine implements ImageEngine {
 
 
     /**
-     * 获取图片加载框架中的缓存Bitmap，不用拼图功能可以直接返回null
-     *
-     * @param context 上下文
-     * @param uri    图片路径
-     * @param width   图片宽度
-     * @param height  图片高度
-     * @return Bitmap
-     * @throws Exception 异常直接抛出，EasyPhotos内部处理
+     * Get the cached Bitmap in the image loading framework
      */
-    //安卓10推荐uri，并且path的方式不再可用
     @Override
     public Bitmap getCacheBitmap(@NonNull Context context, @NonNull Uri uri, int width, int height) throws Exception {
         return Glide.with(context).asBitmap().load(uri).submit(width, height).get();

@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             NavInflater navInflater = navController.getNavInflater();
             NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
             navGraph.setStartDestination(R.id.navigation_map);
-            navController.setGraph(navGraph, new Bundle());
+            navController.setGraph(navGraph, getIntent().getExtras());
+
         }
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -151,37 +152,6 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         // For every 2s, update user's location
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 8,mLocationListener);
     }
-
-    /**
-     * Calculate distance through post location and current location
-     * @param current current user's location
-     * @param postPoint post location
-     * @return the distance in km
-     */
-    static public double caldistance(GeoPoint current, GeoPoint postPoint)
-    {
-        double lon1 = Math.toRadians(current.getLongitude());
-        double lon2 = Math.toRadians(postPoint.getLongitude());
-        double lat1 = Math.toRadians(current.getLatitude());
-        double lat2 = Math.toRadians(postPoint.getLatitude());
-
-        // Haversine formula
-        double dlon = lon2 - lon1;
-        double dlat = lat2 - lat1;
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.pow(Math.sin(dlon / 2),2);
-
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        // Radius of earth in kilometers. Use 3956
-        // for miles
-        double r = 6371;
-
-        // calculate the result
-        return (c * r);
-    }
-
 
     @Override
     public void onResume() {

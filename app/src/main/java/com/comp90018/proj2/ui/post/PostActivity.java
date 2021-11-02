@@ -97,6 +97,7 @@ public class PostActivity extends AppCompatActivity {
     List<CommentItem> listComment;
     static String COMMENT_KEY = "Comments" ;
 
+
     //static String POST_KEY = "Post";
 
     static String POST_KEY = "Post_Temp";
@@ -293,11 +294,41 @@ public class PostActivity extends AppCompatActivity {
                     CommentItem comment = new CommentItem(comment_content,comment_userid,comment_headicon,comment_username,comment_timestamp);
                     listComment.add(comment);
                 }
+                if(listComment.toArray().length>0){
+                    firebaseFirestore.collection(POST_KEY).document(PostKey)
+                            .update("PostFlag","1")
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("Modify PostFlag", "DocumentSnapshot successfully updated!");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("Modify PostFlag", "Error updating document", e);
+                                }
+                            });
+                }
+                else {
+                    firebaseFirestore.collection(POST_KEY).document(PostKey)
+                            .update("PostFlag","0")
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("Modify PostFlag", "DocumentSnapshot successfully updated!");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("Modify PostFlag", "Error updating document", e);
+                                }
+                            });
+                }
                 Log.d("TAG", "onSuccess11: " + listComment);
                 commentAdapter = new CommentAdapter(getApplicationContext(),listComment);
                 RvComment.setAdapter(commentAdapter);
-
-
             }
 
         });
