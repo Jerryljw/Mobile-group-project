@@ -38,7 +38,8 @@
             android:label="Details"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".ui.signUp.SignUpActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="adjustNothing"/>
         <activity android:name=".ui.sendPost.SendPostActivity" />
 
         <provider
