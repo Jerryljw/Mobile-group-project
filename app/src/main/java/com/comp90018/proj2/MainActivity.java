@@ -2,8 +2,13 @@ package com.comp90018.proj2;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,6 +18,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.NavGraph;
@@ -28,11 +34,19 @@ import com.google.firebase.firestore.GeoPoint;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MainActivity extends AppCompatActivity implements LocationCommunication {
+public class MainActivity extends AppCompatActivity implements LocationCommunication, SensorEventListener {
 // implements LocationCommunication to share the location with child fragments
     private ActivityMainBinding binding;
     private String TAG = "MainActivity";
 
+    //shakeshake's bianliang
+    private long lastUpdate = 0;
+    private float last_x, last_y, last_z;
+    private static final int SHAKE_THRESHOLD = 600;
+    private int bb = 0;
+
+    private SensorManager senSensorManager;
+    private Sensor senAccelerometer;
 
     // get user's current location
     private GeoPoint current;
@@ -44,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationUpdate();
 
+        //shakeshake
+        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
 
         Log.i(TAG, "onCreate: ");
 
@@ -170,6 +188,56 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
     protected void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy: ");
+
+    }
+
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            long curTime = System.currentTimeMillis();
+
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+
+                if (speed > SHAKE_THRESHOLD) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    // 设置提示信息
+                    builder.setMessage("Do you want to share your feelings about using the program with us?");
+                    // 设置按钮
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(MainActivity.this, FeedbackActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    // 显示对话框（弹出）
+                    builder.show();
+                }
+                last_x = x;
+                last_y = y;
+                last_z = z;
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
 }

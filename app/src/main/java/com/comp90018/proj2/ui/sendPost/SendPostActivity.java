@@ -40,6 +40,11 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.ImageLabeling;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
@@ -50,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -149,6 +155,9 @@ public class SendPostActivity extends AppCompatActivity {
         // Longitude: add Observer
         sendPostViewModel.getLongitude().observe(this, tPostLon::setText);
 
+        // Post Species: add Observer
+        sendPostViewModel.getSpecies().observe(this, tPostSpecies::setText);
+
 
         sendPostViewModel.getSendPostFormState().observe(this, sendPostFormState -> {
             if (sendPostFormState == null) {
@@ -197,6 +206,7 @@ public class SendPostActivity extends AppCompatActivity {
         });
     }
 
+
     private void selectImage() {
 //        Intent intent = new Intent(SendPostActivity.this, PhotoActivity.class);
         EasyPhotos.createAlbum(SendPostActivity.this, true, false, GlideEngine.getInstance())
@@ -212,6 +222,36 @@ public class SendPostActivity extends AppCompatActivity {
                         opts.inSampleSize = 3;
                         Bitmap bm = BitmapFactory.decodeFile(currentFilePath, opts);
                         newImageButton.setImageBitmap(bm);
+
+                        InputImage image = InputImage.fromBitmap(bm, 0);
+                        ImageLabeler labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
+
+                        labeler.process(image)
+                                .addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {
+                                    @Override
+                                    public void onSuccess(@NonNull List<ImageLabel> labels) {
+
+//                                        for (ImageLabel label : labels) {
+//                                            String text = label.getText();
+//                                            float confidence = label.getConfidence();
+//                                            int index = label.getIndex();
+//                                            Log.i(TAG, "Labeling: " + text + " " + confidence + " " + index);
+//                                        }
+                                        if (labels.size() == 0) {
+                                            Toast.makeText(getApplicationContext(), R.string.error_label, Toast.LENGTH_LONG).show();
+                                        } else {
+                                            sendPostViewModel.setSpecies(labels.get(0).getText());
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getApplicationContext(), R.string.error_label, Toast.LENGTH_LONG).show();
+
+                                    }
+                                });
+
                     }
 
                     @Override
