@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
     private static final int SHAKE_THRESHOLD = 600;
-    private int bb = 0;
+    private boolean bb = false;
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
@@ -209,24 +209,24 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
 
                 float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
 
-                if (speed > SHAKE_THRESHOLD) {
+                if (speed > SHAKE_THRESHOLD && !bb) {
+                    bb = true;
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    // 设置提示信息
                     builder.setMessage("Do you want to share your feelings about using the program with us?");
-                    // 设置按钮
                     builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = new Intent(MainActivity.this, FeedbackActivity.class);
+                            bb = false;
                             startActivity(intent);
                         }
                     });
                     builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            bb = false;
                         }
                     });
-                    // 显示对话框（弹出）
                     builder.show();
                 }
                 last_x = x;
