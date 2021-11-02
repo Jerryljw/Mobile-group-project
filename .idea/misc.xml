@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Mobile Computing git/Mobile-group-project/app/src/main/res/drawable/background_gradient.xml" value="0.4197916666666667" />
+        <entry key="..\:/Mobile Computing git/Mobile-group-project/app/src/main/res/layout/fragment_account.xml" value="0.4" />
+        <entry key="..\:/Mobile Computing git/Mobile-group-project/app/src/main/res/layout/fragment_find.xml" value="0.4036458333333333" />
+        <entry key="..\:/Mobile Computing git/Mobile-group-project/app/src/main/res/layout/update_password.xml" value="0.4036458333333333" />
         <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_login.xml" value="0.215625" />
         <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_main.xml" value="0.215625" />
         <entry key="..\:/Mobile-group-project/app/src/main/res/layout/activity_middle.xml" value="0.215625" />
