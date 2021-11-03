@@ -219,6 +219,7 @@ public class PlantFinderFragment extends Fragment {
                                                             cardItem.setPostId(postId);
                                                             cardItem.setPostFlag(postFlag);
                                                             cardItem.setPostType(postType);
+                                                            cardItem.setPostSpecies(postSpecies);
                                                             Log.e("PostType",postType);
                                                             if(postType.equalsIgnoreCase("Plant")){
                                                                 cardItemArrayList.add(cardItem);}

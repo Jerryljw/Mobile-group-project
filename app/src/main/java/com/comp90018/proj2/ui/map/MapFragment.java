@@ -194,7 +194,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                                 cardItem.setPostFlag(postFlag);
                                 cardItem.setPoint(postGeoPoint);
                                 cardItem.setTitles(postTitle);
-
+                                cardItem.setPostSpecies(postSpecies);
 
                                 if (userDisplayName == null || userDisplayName.isEmpty()) {
                                     cardItem.setUsernames("User-" + postUserid);

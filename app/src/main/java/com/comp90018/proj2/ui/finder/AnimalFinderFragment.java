@@ -204,7 +204,7 @@ public class AnimalFinderFragment extends Fragment {
                                                             cardItem.setPostId(postId);
                                                             cardItem.setPostTime(postTime);
                                                             cardItem.setPostFlag(postFlag);
-
+                                                            cardItem.setPostSpecies(postSpecies);
                                                             cardItem.setPostType(postType);
                                                             if(postType.equalsIgnoreCase("Animal")){
                                                             cardItemArrayList.add(cardItem);}
