@@ -202,7 +202,7 @@ public class AccountFragment extends Fragment {
                                     Toast.makeText(getActivity().getApplicationContext(), "Password Update succeed", Toast.LENGTH_SHORT).show();
                                     show.dismiss();
                                 }else {
-                                    Toast.makeText(getActivity().getApplicationContext(), "Updated Password Failed!!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity().getApplicationContext(), "Updated Password Failed!! Please re-login to try.", Toast.LENGTH_SHORT).show();
 
                                 }
                             }
