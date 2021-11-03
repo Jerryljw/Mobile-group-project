@@ -29,6 +29,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     private Context mContext;
     private List<CommentItem> commentData;
+    private final static String TAG = "CommentAdapter";
 
     public CommentAdapter(Context mContext, List<CommentItem> mData) {
         this.mContext = mContext;
@@ -51,7 +52,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                 .fitCenter()).into(holder.img_user);
         holder.tv_name.setText(commentData.get(position).getUname());
         holder.tv_content.setText(commentData.get(position).getContent());
-        Log.d("TAG", "setTimestamp: " + commentData.get(position).getTimestamp().toString());
+        Log.d(TAG, "setTimestamp: " + commentData.get(position).getTimestamp().toString());
         holder.tv_date.setText(timestampToString((long) commentData.get(position).getTimestamp().getSeconds()));
 
     }

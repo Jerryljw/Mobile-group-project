@@ -1,46 +1,18 @@
 package com.comp90018.proj2.ui.post;
 
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
-
 import android.content.Intent;
+import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.comp90018.proj2.MainActivity;
-import com.comp90018.proj2.R;
-
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Registry;
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.module.AppGlideModule;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.DrawableImageViewTarget;
-import com.bumptech.glide.request.target.Target;
-import com.comp90018.proj2.R;
-import com.comp90018.proj2.MainActivity;
-import com.comp90018.proj2.utils.GlideApp;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,7 +23,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.utils.GlideApp;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -69,15 +40,13 @@ import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
-
-import java.io.InputStream;
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import java.util.Objects;
 
 public class PostActivity extends AppCompatActivity {
     PostItem postItem;
@@ -175,23 +144,24 @@ public class PostActivity extends AppCompatActivity {
                     data.put("CommentUserId", comment.getUid());
                     data.put("CommentUsername", comment.getUname());
 
-                    Log.d("TAG", "onClick: add data" + comment.getUid());
+//                    Log.d("TAG", "onClick: add data" + comment.getUid());
 
                     firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY)
                             .add(data)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    Log.d("TAG", "onSuccess: onClick: add data ");
+//                                    Log.d("TAG", "onSuccess: onClick: add data ");
                                     Toast.makeText(getApplicationContext(), "comment added", Toast.LENGTH_SHORT).show();
                                     editTextComment.setText("");
                                     btnAddComment.setVisibility(View.VISIBLE);
+                                    hideKeyboard(view);
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull @NotNull Exception e) {
-                                    Log.d("TAG", "onfil: onClick: add data ");
+//                                    Log.d("TAG", "onfil: onClick: add data ");
                                     Toast.makeText(getApplicationContext(), "comment added failure", Toast.LENGTH_SHORT).show();
 
                                 }
@@ -209,7 +179,7 @@ public class PostActivity extends AppCompatActivity {
                         Intent intent1 = new Intent(PostActivity.this, MainActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putInt("fromLocationToMap", 1);
-                        Log.d("TAGaaaaa", "onClick: " + postLocation);
+//                        Log.d("TAGaaaaa", "onClick: " + postLocation);
                         bundle.putDouble("latitude", postLocation.getLatitude());
                         bundle.putDouble("longitude", postLocation.getLongitude());
                         intent1.putExtras(bundle);
@@ -229,7 +199,7 @@ public class PostActivity extends AppCompatActivity {
                     //load title
                     txtPostTitle.setText((String) dataMap.get("PostTitle"));
                     //load image
-                    Log.d("TAG", "onSuccess: " + dataMap.get("PostImage"));
+//                    Log.d("TAG", "onSuccess: " + dataMap.get("PostImage"));
                     StorageReference gsReference = firebaseStorage
                             .getReferenceFromUrl(PREFIX+(String)  dataMap.get("PostImage"));
 
@@ -246,7 +216,11 @@ public class PostActivity extends AppCompatActivity {
                         txtPostUsername.setText((String)dataMap.get("UserDisplayName"));
                     }
                     //loading species by ai model
-                    String post_species = (String) dataMap.get("PostSpecies");
+                    String post_species = "";
+                    if(dataMap.containsKey("PostSpecies")) {
+                        post_species = (String) dataMap.get("PostSpecies");
+                    }
+
                     if(post_species.equals("")){
                         txtPostSpecie.setText("");
                     }
@@ -298,7 +272,7 @@ public class PostActivity extends AppCompatActivity {
 
     private void iniRvComment() {
 
-        Log.d("TAG", "onSuccess11: " + "hellsoosos");
+//        Log.d("TAG", "onSuccess11: " + "hellsoosos");
         Task<QuerySnapshot> commentRef = firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY).get();
         commentRef.addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -311,7 +285,7 @@ public class PostActivity extends AppCompatActivity {
                     Timestamp comment_timestamp = documentSnapshot.getTimestamp(COMMENT_TIME);
                     String comment_headicon = documentSnapshot.getString(COMMENT_USERHEADICON);
                     String comment_username = documentSnapshot.getString(COMMENT_USERNAME);
-                    Log.d("TAG", "onSuccess11: "+ comment_content);
+//                    Log.d("TAG", "onSuccess11: "+ comment_content);
                     CommentItem comment = new CommentItem(comment_content,comment_userid,comment_headicon,comment_username,comment_timestamp);
                     listComment.add(comment);
                 }
@@ -347,7 +321,8 @@ public class PostActivity extends AppCompatActivity {
                                 }
                             });
                 }
-                Log.d("TAG", "onSuccess11: " + listComment);
+//                Log.d("TAG", "onSuccess11: " + listComment);
+                Collections.sort(listComment,new CommentsItemComparator());
                 commentAdapter = new CommentAdapter(getApplicationContext(),listComment);
                 RvComment.setAdapter(commentAdapter);
             }
@@ -356,6 +331,16 @@ public class PostActivity extends AppCompatActivity {
 
 
     }
+    class CommentsItemComparator implements Comparator<CommentItem>{
+        public int compare(CommentItem c1, CommentItem c2){
+            if (c1.getTimestamp().compareTo(c2.getTimestamp())==0)
+                return 0;
+            else if (c1.getTimestamp().compareTo(c2.getTimestamp()) < 0)
+                return 1;
+            else
+                return -1;
+        }
+    }
 
 
     public void back_onclick(View view)
@@ -363,6 +348,14 @@ public class PostActivity extends AppCompatActivity {
         Intent intent=new Intent();
         intent.setClass(PostActivity.this, MainActivity.class);
         PostActivity.this.startActivity(intent);
+    }
+
+    public void hideKeyboard(View view){
+        InputMethodManager inputMethodManager = (InputMethodManager) view.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(inputMethodManager!=null){
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
+        }
     }
 
 
