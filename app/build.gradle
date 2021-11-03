@@ -2,7 +2,6 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
-    id 'com.jakewharton.butterknife'
 }
 
 android {
@@ -61,6 +60,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.3.2'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.firebaseui:firebase-ui-storage:7.2.0'
+    implementation 'com.google.mlkit:image-labeling:17.0.5'
+    implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.5'
 
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.google.firebase:firebase-core'
@@ -75,9 +76,6 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     implementation 'androidx.camera:camera-view:1.0.0-alpha27'
 
-    /** ButterKnife **/
-    implementation 'com.jakewharton:butterknife:10.1.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 
     /** EasyPhoto **/
     implementation 'com.github.HuanTanSheng:EasyPhotos:3.1.4'
@@ -88,4 +86,5 @@ dependencies {
     /** UI **/
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.kyleduo.switchbutton:library:2.1.0'
+    implementation 'com.microsoft.design:fluent-system-icons:1.1.147@aar'
 }

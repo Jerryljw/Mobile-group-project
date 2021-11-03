@@ -2,8 +2,13 @@ package com.comp90018.proj2;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,6 +18,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.NavGraph;
@@ -28,11 +34,19 @@ import com.google.firebase.firestore.GeoPoint;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MainActivity extends AppCompatActivity implements LocationCommunication {
+public class MainActivity extends AppCompatActivity implements LocationCommunication, SensorEventListener {
 // implements LocationCommunication to share the location with child fragments
     private ActivityMainBinding binding;
     private String TAG = "MainActivity";
 
+    //shakeshake's bianliang
+    private long lastUpdate = 0;
+    private float last_x, last_y, last_z;
+    private static final int SHAKE_THRESHOLD = 600;
+    private boolean bb = false;
+
+    private SensorManager senSensorManager;
+    private Sensor senAccelerometer;
 
     // get user's current location
     private GeoPoint current;
@@ -44,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationUpdate();
 
+        //shakeshake
+        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
 
         Log.i(TAG, "onCreate: ");
 
@@ -54,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                R.id.navigation_finder, R.id.navigation_map, R.id.navigation_account)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 
@@ -63,8 +81,9 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
 
             NavInflater navInflater = navController.getNavInflater();
             NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
-            navGraph.setStartDestination(R.id.navigation_dashboard);
-            navController.setGraph(navGraph, new Bundle());
+            navGraph.setStartDestination(R.id.navigation_map);
+            navController.setGraph(navGraph, getIntent().getExtras());
+
         }
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -140,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             return;
         }
 
-        Location location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location == null) {
             current = new GeoPoint(-34, 151);
         } else {
@@ -151,37 +170,6 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
         // For every 2s, update user's location
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 8,mLocationListener);
     }
-
-    /**
-     * Calculate distance through post location and current location
-     * @param current current user's location
-     * @param postPoint post location
-     * @return the distance in km
-     */
-    static public double caldistance(GeoPoint current, GeoPoint postPoint)
-    {
-        double lon1 = Math.toRadians(current.getLongitude());
-        double lon2 = Math.toRadians(postPoint.getLongitude());
-        double lat1 = Math.toRadians(current.getLatitude());
-        double lat2 = Math.toRadians(postPoint.getLatitude());
-
-        // Haversine formula
-        double dlon = lon2 - lon1;
-        double dlat = lat2 - lat1;
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.pow(Math.sin(dlon / 2),2);
-
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        // Radius of earth in kilometers. Use 3956
-        // for miles
-        double r = 6371;
-
-        // calculate the result
-        return (c * r);
-    }
-
 
     @Override
     public void onResume() {
@@ -200,6 +188,56 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
     protected void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy: ");
+
+    }
+
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            long curTime = System.currentTimeMillis();
+
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+
+                if (speed > SHAKE_THRESHOLD && !bb) {
+                    bb = true;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage("Do you want to share your feelings about using the program with us?");
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(MainActivity.this, FeedbackActivity.class);
+                            bb = false;
+                            startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            bb = false;
+                        }
+                    });
+                    builder.show();
+                }
+                last_x = x;
+                last_y = y;
+                last_z = z;
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
 }

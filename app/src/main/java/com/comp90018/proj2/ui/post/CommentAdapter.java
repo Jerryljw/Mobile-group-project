@@ -29,6 +29,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     private Context mContext;
     private List<CommentItem> commentData;
+    private final static String TAG = "CommentAdapter";
 
     public CommentAdapter(Context mContext, List<CommentItem> mData) {
         this.mContext = mContext;
@@ -39,19 +40,21 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @NotNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View row = LayoutInflater.from(mContext).inflate(R.layout.comment_layout,parent,false);
+        View row = LayoutInflater.from(mContext).inflate(R.layout.comment_layout, parent, false);
         return new CommentViewHolder(row);
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull CommentViewHolder holder, int position) {
+
         Glide.with(mContext).load(commentData.get(position).getUimg()).apply(new RequestOptions()
                 .placeholder(R.drawable.ic_card_portrait)
                 .fitCenter()).into(holder.img_user);
         holder.tv_name.setText(commentData.get(position).getUname());
         holder.tv_content.setText(commentData.get(position).getContent());
-        Log.d("TAG", "setTimestamp: "+ commentData.get(position).getTimestamp().toString());
-        holder.tv_date.setText(timestampToString((long)commentData.get(position).getTimestamp().getSeconds()));
+        Log.d(TAG, "setTimestamp: " + commentData.get(position).getTimestamp().toString());
+        holder.tv_date.setText(timestampToString((long) commentData.get(position).getTimestamp().getSeconds()));
+
     }
 
     @Override
@@ -60,10 +63,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
 
-
-    public class CommentViewHolder extends RecyclerView.ViewHolder{
+    public class CommentViewHolder extends RecyclerView.ViewHolder {
         ImageView img_user;
-        TextView tv_name,tv_content,tv_date;
+        TextView tv_name, tv_content, tv_date;
 
         public CommentViewHolder(View itemView) {
             super(itemView);
@@ -73,9 +75,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             tv_date = itemView.findViewById(R.id.comment_time);
         }
     }
+
     private String timestampToString(long time) {
-        Date thisdate = new Date(time*1000);
-        String string_date = DateFormat.format("dd/MM/yy hh:mm",thisdate).toString();
+        Date thisdate = new Date(time * 1000);
+        String string_date = DateFormat.format("dd/MM/yy hh:mm", thisdate).toString();
         return string_date;
     }
 }

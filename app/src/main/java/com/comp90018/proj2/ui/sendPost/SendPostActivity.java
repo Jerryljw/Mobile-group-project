@@ -1,6 +1,7 @@
 package com.comp90018.proj2.ui.sendPost;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,15 +19,19 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySendPostBinding;
 import com.comp90018.proj2.ui.photo.GlideEngine;
+import com.comp90018.proj2.ui.post.PostActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,6 +46,11 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.ImageLabeling;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
@@ -50,7 +61,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class SendPostActivity extends AppCompatActivity {
@@ -74,6 +87,7 @@ public class SendPostActivity extends AppCompatActivity {
     private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
     // Fields
     ImageButton newImageButton;
+    ImageButton bUpdateLocation;
     EditText tPostLat;
     EditText tPostLon;
     EditText tPostTitle;
@@ -109,8 +123,36 @@ public class SendPostActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent1 = new Intent(SendPostActivity.this, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("fromLocationToMap", 1);
+        intent1.putExtras(bundle);
+        double latitude = sendPostViewModel.getLatitude().getValue() == null ?
+                -34 : Double.parseDouble(sendPostViewModel.getLatitude().getValue());
+        double longitude = sendPostViewModel.getLongitude().getValue() == null ?
+                151 : Double.parseDouble(sendPostViewModel.getLongitude().getValue());
+
+        bundle.putDouble("latitude", latitude);
+        bundle.putDouble("longitude", longitude);
+        intent1.putExtras(bundle);
+        startActivity(intent1);
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar supportActionBar = getSupportActionBar();
+        Objects.requireNonNull(supportActionBar).setDisplayHomeAsUpEnabled(true);
+//        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+//            @Override
+//            public void handleOnBackPressed() {
+//
+//            }
+//        };
+//        getOnBackPressedDispatcher().addCallback(this, callback);
+
 
         binding = ActivitySendPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -126,6 +168,7 @@ public class SendPostActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate: ");
 
         newImageButton = binding.buttonNewImage;
+        bUpdateLocation = binding.buttonUpdateLocation;
         tPostLat = binding.textPostLat;
         tPostLon = binding.textPostLon;
         tPostTitle = binding.textPostTitle;
@@ -148,6 +191,9 @@ public class SendPostActivity extends AppCompatActivity {
 
         // Longitude: add Observer
         sendPostViewModel.getLongitude().observe(this, tPostLon::setText);
+
+        // Post Species: add Observer
+        sendPostViewModel.getSpecies().observe(this, tPostSpecies::setText);
 
 
         sendPostViewModel.getSendPostFormState().observe(this, sendPostFormState -> {
@@ -195,7 +241,12 @@ public class SendPostActivity extends AppCompatActivity {
             selectImage();
             // [END select image]
         });
+
+        bUpdateLocation.setOnClickListener(v -> {
+            getDeviceLocation();
+        });
     }
+
 
     private void selectImage() {
 //        Intent intent = new Intent(SendPostActivity.this, PhotoActivity.class);
@@ -212,6 +263,36 @@ public class SendPostActivity extends AppCompatActivity {
                         opts.inSampleSize = 3;
                         Bitmap bm = BitmapFactory.decodeFile(currentFilePath, opts);
                         newImageButton.setImageBitmap(bm);
+
+                        InputImage image = InputImage.fromBitmap(bm, 0);
+                        ImageLabeler labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
+
+                        labeler.process(image)
+                                .addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {
+                                    @Override
+                                    public void onSuccess(@NonNull List<ImageLabel> labels) {
+
+//                                        for (ImageLabel label : labels) {
+//                                            String text = label.getText();
+//                                            float confidence = label.getConfidence();
+//                                            int index = label.getIndex();
+//                                            Log.i(TAG, "Labeling: " + text + " " + confidence + " " + index);
+//                                        }
+                                        if (labels.size() == 0) {
+                                            Toast.makeText(getApplicationContext(), R.string.error_label, Toast.LENGTH_LONG).show();
+                                        } else {
+                                            sendPostViewModel.setSpecies(labels.get(0).getText());
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getApplicationContext(), R.string.error_label, Toast.LENGTH_LONG).show();
+
+                                    }
+                                });
+
                     }
 
                     @Override
@@ -268,6 +349,7 @@ public class SendPostActivity extends AppCompatActivity {
         // Test
         Map<String, Object> postDto = new HashMap<>();
         postDto.put("PostImage", imagePath);
+        postDto.put("PostFlag", 0);
         postDto.put("PostTitle", tPostTitle.getText().toString());
         postDto.put("PostMessage", tPostMessage.getText().toString());
         postDto.put("PostLocation", new GeoPoint(Double.parseDouble(tPostLat.getText().toString()),
@@ -277,9 +359,11 @@ public class SendPostActivity extends AppCompatActivity {
         postDto.put("PostType", bPostType.isChecked() ? getResources().getString(R.string.post_type_on)
                 : getResources().getString(R.string.post_type_off));
         postDto.put("UserDisplayName", mAuth.getCurrentUser() == null ? "" : mAuth.getCurrentUser().getDisplayName());
+        postDto.put("UserPhotoUri", (mAuth.getCurrentUser() == null || mAuth.getCurrentUser().getPhotoUrl() == null) ?
+                "" : mAuth.getCurrentUser().getPhotoUrl().toString());
         postDto.put("UserId", mAuth.getUid());
-
-        db.collection("Post")
+        
+        db.collection("Post_Temp")
                 .add(postDto)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override

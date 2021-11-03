@@ -12,6 +12,8 @@ public class SendPostViewModel extends ViewModel {
 
     private MutableLiveData<String> longitude;
     private MutableLiveData<String> latitude;
+    private MutableLiveData<String> species;
+
 
     private MutableLiveData<SendPostFormState> sendPostFormState = new MutableLiveData<>();
 
@@ -19,6 +21,7 @@ public class SendPostViewModel extends ViewModel {
     SendPostViewModel() {
         longitude = new MutableLiveData<String>();
         latitude = new MutableLiveData<String>();
+        species = new MutableLiveData<String>();
     }
 
     public MutableLiveData<String> getLongitude() {
@@ -27,6 +30,14 @@ public class SendPostViewModel extends ViewModel {
 
     public MutableLiveData<String> getLatitude() {
         return latitude;
+    }
+
+    public MutableLiveData<String> getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species.setValue(species);
     }
 
     public void updateLocation(double latitude, double longitude) {

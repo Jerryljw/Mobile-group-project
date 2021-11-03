@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,10 +20,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivityLoginBinding;
 import com.comp90018.proj2.ui.signUp.SignUpActivity;
+import com.comp90018.proj2.utils.GlideApp;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -76,6 +79,8 @@ public class LoginActivity extends AppCompatActivity {
         final Button loginButton = binding.login;
         final TextView signUpText = binding.signUp;
         final ProgressBar loadingProgressBar = binding.loading;
+        final ImageView logoImage = binding.logo;
+
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
 
@@ -150,6 +155,13 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
         // [END sign_up_click_listener]
+
+        GlideApp.with(getApplication())
+                .load("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com" +
+                        "/o/Luora.png?alt=media&token=0a004bd2-9c1e-434f-8749-fecee60c38ba")
+                .apply(new RequestOptions()
+                        .fitCenter())
+                .into(logoImage);
     }
 
     private void login(String email, String password) {
@@ -159,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
                     } else {
-//                        showLoginFailed(null);
+                        showLoginFailed();
                         // If sign in fails, display a message to the user.
                         try {
                             throw Objects.requireNonNull(task.getException());
@@ -185,7 +197,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void showLoginFailed(@StringRes Integer errorString) {
-        Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+    private void showLoginFailed() {
+        Toast.makeText(getApplicationContext(), R.string.invalid_password, Toast.LENGTH_SHORT).show();
     }
 }

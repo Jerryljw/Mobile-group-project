@@ -222,7 +222,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_lon" />
 
-
             <TextView
                 android:id="@+id/text_message"
                 android:layout_width="130dp"
@@ -236,6 +235,22 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_post_lat" />
+
+            <ImageButton
+                android:id="@+id/button_update_location"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="100dp"
+                android:contentDescription="@string/select_post_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.926"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_my_location"
+                android:background="@color/white"
+                android:scaleType="fitCenter"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <com.kyleduo.switchbutton.SwitchButton
                 android:id="@+id/switch_post_type"

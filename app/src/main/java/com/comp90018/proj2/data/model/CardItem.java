@@ -11,13 +11,31 @@ public class CardItem {
     private String postId;
 
     private StorageReference img;
+
+    public StorageReference getHeadIcon() {
+        return headIcon;
+    }
+
+    public void setHeadIcon(StorageReference headIcon) {
+        this.headIcon = headIcon;
+    }
+
+    private StorageReference headIcon;
     private String titles;
-    private int headsIcon;
     private String usernames;
     private Timestamp postTime;
 
     private String postSpecies;
     private String postType;
+    private String postMessage;
+
+    public String getPostMessage() {
+        return postMessage;
+    }
+
+    public void setPostMessage(String postMessage) {
+        this.postMessage = postMessage;
+    }
 
     public String getPostSpecies() {
         return postSpecies;
@@ -100,14 +118,6 @@ public class CardItem {
         this.titles = titles;
     }
 
-    public int getHeadsIcon() {
-        return headsIcon;
-    }
-
-    public void setHeadsIcon(int headsIcon) {
-        this.headsIcon = headsIcon;
-    }
-
     public String getUsernames() {
         return usernames;
     }
@@ -116,5 +126,21 @@ public class CardItem {
         this.usernames = usernames;
     }
 
-
+    @Override
+    public String toString() {
+        return "CardItem{" +
+                "userId='" + userId + '\'' +
+                ", postId='" + postId + '\'' +
+                ", img=" + img +
+                ", titles='" + titles + '\'' +
+                ", headsIcon=" + headIcon +
+                ", usernames='" + usernames + '\'' +
+                ", postTime=" + postTime +
+                ", postSpecies='" + postSpecies + '\'' +
+                ", postType='" + postType + '\'' +
+                ", postMessage='" + postMessage + '\'' +
+                ", postFlag=" + postFlag +
+                ", point=" + point +
+                '}';
+    }
 }

@@ -1,6 +1,5 @@
 package com.comp90018.proj2.ui.finder;
 
-import static com.comp90018.proj2.MainActivity.caldistance;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.data.model.CardItem;
 import com.comp90018.proj2.ui.post.PostActivity;
+import com.comp90018.proj2.utils.GeoPointUtils;
 import com.comp90018.proj2.utils.GlideApp;
 import com.comp90018.proj2.utils.LocationCommunication;
 import com.comp90018.proj2.utils.PostLocSort;
@@ -46,6 +46,7 @@ import java.util.Collections;
 
 public class PlantFinderFragment extends Fragment {
 
+    private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
     // store items
     private ArrayList<CardItem> cardItemArrayList = new ArrayList<>();
     private View view;
@@ -191,8 +192,10 @@ public class PlantFinderFragment extends Fragment {
                                                                     .getTimestamp("PostTime");
                                                             String postType = documentSnapshot
                                                                     .getString("PostType");
-                                                            String postUserid = documentSnapshot
-                                                                    .getString("UserId");
+                                                            String postUserHeadIcon = documentSnapshot
+                                                                    .getString("UserPhotoUri");
+                                                            String postUserName = documentSnapshot
+                                                                    .getString("UserDisplayName");
                                                             GeoPoint postGeoPoint = documentSnapshot
                                                                     .getGeoPoint("PostLocation");
                                                             // Log.e("Location", String.valueOf(postGeoPoint));
@@ -201,20 +204,22 @@ public class PlantFinderFragment extends Fragment {
                                                             String postTitle = documentSnapshot
                                                                     .getString("PostTitle");
                                                             String postId = document.getId();
-                                                            String postFlag = documentSnapshot
-                                                                    .getString("PostFlag");
+                                                            int postFlag = Math.toIntExact(documentSnapshot
+                                                                    .getLong("PostFlag"));
+
 
                                                             // set data
                                                             CardItem cardItem = new CardItem();
-                                                            cardItem.setImg(storage.getReferenceFromUrl(postImg));
-                                                            cardItem.setHeadsIcon(R.drawable.ic_card_portrait);
+                                                            cardItem.setImg(storage.getReferenceFromUrl(PREFIX+postImg));
+                                                            cardItem.setHeadIcon(storage.getReferenceFromUrl(postUserHeadIcon));
                                                             cardItem.setTitles(postTitle);
-                                                            cardItem.setUsernames("test");
+                                                            cardItem.setUsernames(postUserName);
                                                             cardItem.setPoint(postGeoPoint);
                                                             cardItem.setPostTime(postTime);
                                                             cardItem.setPostId(postId);
-                                                            cardItem.setPostFlag(Integer.parseInt(postFlag));
+                                                            cardItem.setPostFlag(postFlag);
                                                             cardItem.setPostType(postType);
+                                                            cardItem.setPostSpecies(postSpecies);
                                                             Log.e("PostType",postType);
                                                             if(postType.equalsIgnoreCase("Plant")){
                                                                 cardItemArrayList.add(cardItem);}
@@ -271,7 +276,7 @@ public class PlantFinderFragment extends Fragment {
 
         // show current location and format to 2 decimal places
         private GeoPoint current;
-        private DecimalFormat df = new DecimalFormat("0.00");
+        private DecimalFormat df = new DecimalFormat("0.0");
 
         public HomeAdapter(Context context, ArrayList<CardItem> cardItemArrayList, GeoPoint current) {
             this.context = context;
@@ -302,10 +307,8 @@ public class PlantFinderFragment extends Fragment {
             CardItem cardData = cardItemArrayList.get(position);
             //holder.img.setImageResource(cardData.getImg());
             holder.title.setText(cardData.getTitles());
-            holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
-            holder.distance.setText(df.format(caldistance(current, cardData.getPoint())) + " km");
-
+            holder.distance.setText(df.format(GeoPointUtils.calDistance(current, cardData.getPoint())) + " km");
             // 0 means unsolved
             if (cardData.getPostFlag() == 0) {
                 holder.postFlag.setImageResource(R.drawable.ic_finder_question);
@@ -318,6 +321,11 @@ public class PlantFinderFragment extends Fragment {
                     .load(cardData.getImg())
                     .centerCrop()
                     .into(holder.img);
+            GlideApp
+                    .with(context)
+                    .load(cardData.getHeadIcon())
+                    .centerCrop()
+                    .into(holder.head);
         }
 
         @Override
@@ -337,7 +345,7 @@ public class PlantFinderFragment extends Fragment {
                 super(itemView);
                 img = itemView.findViewById(R.id.home_item_img);
                 title = itemView.findViewById(R.id.home_item_title);
-                head = itemView.findViewById(R.id.home_item_head);
+                head = itemView.findViewById(R.id.home_item_user_img);
                 username = itemView.findViewById(R.id.home_item_username);
                 distance = itemView.findViewById(R.id.home_item_location);
                 postFlag = itemView.findViewById(R.id.home_item_post_flag);
