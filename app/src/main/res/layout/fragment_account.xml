@@ -107,7 +107,8 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="0dp"
                     android:text="Discripe_Name"
-                    android:textSize="18sp"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="24sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/nameLayout" />
 
@@ -123,6 +124,23 @@
                     app:srcCompat="@drawable/ic_baseline_edit_24" />
 
             </LinearLayout>
+
+            <Button
+                android:id="@+id/update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="0dp"
+                android:enabled="true"
+                android:text="Update Profile"
+                android:layout_gravity="center_horizontal"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="129dp" />
 
             <LinearLayout
                 android:id="@+id/linearLayout"
@@ -152,32 +170,32 @@
                     app:layout_constraintTop_toBottomOf="@+id/workplace_textview"
                     app:srcCompat="@drawable/ic_baseline_email_24" />
 
-                <EditText
+                <TextView
                     android:id="@+id/email_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="40dp"
+                    android:layout_marginTop="45dp"
                     android:layout_marginEnd="0dp"
                     android:text="xxxxxx@xxxxxxxxxx.com"
-                    android:textSize="18sp"
+                    android:textSize="24sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.126"
                     app:layout_constraintStart_toEndOf="@+id/email_imageview"
                     app:layout_constraintTop_toBottomOf="@+id/workplace_textview" />
 
-                <ImageView
-                    android:id="@+id/editImageView"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="50dp"
-                    android:layout_marginEnd="8dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.031"
-                    app:layout_constraintStart_toEndOf="@+id/email_textview"
-                    app:layout_constraintTop_toBottomOf="@+id/workplace_textview"
-                    app:srcCompat="@drawable/ic_baseline_edit_24" />
+<!--                <ImageView-->
+<!--                    android:id="@+id/editImageView"-->
+<!--                    android:layout_width="15dp"-->
+<!--                    android:layout_height="15dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:layout_marginTop="50dp"-->
+<!--                    android:layout_marginEnd="8dp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.031"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/email_textview"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/workplace_textview"-->
+<!--                    app:srcCompat="@drawable/ic_baseline_edit_24" />-->
 
             </LinearLayout>
 
@@ -233,21 +251,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
-                <Button
-                    android:id="@+id/update"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="0dp"
-                    android:enabled="true"
-                    android:text="Update Profile"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    tools:ignore="MissingConstraints"
-                    tools:layout_editor_absoluteX="129dp" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -273,6 +276,7 @@
                     android:layout_marginBottom="0dp"
                     android:enabled="true"
                     android:text="@string/action_log_out"
+                    android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:ignore="MissingConstraints"
                     tools:layout_editor_absoluteX="129dp" />
