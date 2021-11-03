@@ -363,7 +363,7 @@ public class SendPostActivity extends AppCompatActivity {
                 "" : mAuth.getCurrentUser().getPhotoUrl().toString());
         postDto.put("UserId", mAuth.getUid());
         
-        db.collection("Post")
+        db.collection("Post_Temp")
                 .add(postDto)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override

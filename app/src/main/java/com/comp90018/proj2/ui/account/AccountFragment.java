@@ -10,12 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -30,6 +32,7 @@ import com.comp90018.proj2.ui.signUp.SignUpActivity;
 import com.comp90018.proj2.utils.GlideApp;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,6 +43,7 @@ import com.google.firebase.storage.UploadTask;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
+import com.comp90018.proj2.databinding.UpdatePasswordBinding;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -52,9 +56,11 @@ public class AccountFragment extends Fragment {
 
     private AccountViewModel accountViewModel;
     private FragmentAccountBinding binding;
+    private UpdatePasswordBinding binding2;
+
     private TextView occupationTxtView, nameTxtView, displayNameView;
-    private TextView emailTxtView, phoneTxtView, videoTxtView, facebookTxtView, twitterTxtView;
-    private ImageView userImageView, emailImageView, phoneImageView, videoImageView,nameImageView;
+    private TextView emailTxtView,newPasswordView,confirmPasswordView;
+    private ImageView userImageView, emailImageView, phoneImageView, nameImageView;
     private ImageView facebookImageView, twitterImageView;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -70,23 +76,23 @@ public class AccountFragment extends Fragment {
         accountViewModel = new ViewModelProvider(this).get(AccountViewModel.class);
 
         binding = FragmentAccountBinding.inflate(inflater, container, false);
+        binding2 = UpdatePasswordBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textAccount;
         occupationTxtView = binding.occupationTextview;
         displayNameView = binding.displayNameTextview;
         emailTxtView = binding.emailTextview;
-        phoneTxtView = binding.phoneTextview;
-        videoTxtView = binding.videoTextview;
-        facebookTxtView = binding.facebookTextview;
+
+
 //        twitterTxtView = binding.twitterTextview;
 
         nameImageView = binding.nameImageView;
         userImageView = binding.userImageview;
         emailImageView = binding.emailImageview;
         phoneImageView = binding.phoneImageview;
-        videoImageView = binding.videoImageview;
-        facebookImageView = binding.facebookImageview;
+
+
 //        twitterImageView = binding.twitterImageview;
 
 
@@ -99,8 +105,7 @@ public class AccountFragment extends Fragment {
         emailTxtView.setText(currentUser.getEmail());
         occupationTxtView.setText("Name");
         displayNameView.setText(Name);
-        phoneTxtView.setText("phone");
-        videoTxtView.setText("Country");
+
 
         userImageView.setOnClickListener(v -> {
             Log.i(TAG, "onClick: selectIcon");
@@ -144,20 +149,74 @@ public class AccountFragment extends Fragment {
                 Toast.makeText(this.getContext(), "Please use a Name longer than 6 letter", Toast.LENGTH_SHORT).show();
             }else{
                 if (currIconPath != null && !"".equals(currIconPath)) {
-                    saveIcon();
+                    saveIcon(currentUser);
 
                 } else {
                     updateUserProfile(Uri.parse(mAuth.getCurrentUser().getPhotoUrl().toString()));
                 }
             }
-//            if (currIconPath != null && !"".equals(currIconPath)) {
-//                saveIcon();
-//
-//            } else {
-//                updateUserProfile(Uri.parse("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com/" +
-//                        "o/icons%2Fvecteezypeople-business-avatarpp0421_generated.jpg?alt=media" +
-//                        "&token=fd8edb77-c9a1-4e07-862c-8a88d0f82261"));
-//            }
+
+        });
+
+        final Button resetPasswordButton = binding.resetPassword;
+        resetPasswordButton.setOnClickListener(view -> {
+
+            FirebaseUser user = mAuth.getCurrentUser();
+            final AlertDialog.Builder alertDialog7 = new AlertDialog.Builder(this.getContext());
+            View view1 = View.inflate(this.getContext(), R.layout.update_password, null);
+            final EditText et = view1.findViewById(R.id.et);
+            Button cancel_button = view1.findViewById(R.id.cancel_button);
+            Button reset_button = view1.findViewById(R.id.reset_button);
+            EditText newPasswordView = view1.findViewById(R.id.new_password);
+            EditText confirmPasswordView = view1.findViewById(R.id.confirm_password);
+            alertDialog7
+                    .setTitle("Reset Password")
+                    .setIcon(R.drawable.ic_baseline_security_24)
+                    .setView(view1)
+                    .create();
+            final AlertDialog show = alertDialog7.show();
+            cancel_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Update Cancelled", Toast.LENGTH_SHORT).show();
+                    show.dismiss();
+                }
+            });
+
+            reset_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String p = newPasswordView.getText().toString();
+                    String cp = confirmPasswordView.getText().toString();
+                    if (p.equals(cp) && p.length()>=6){
+                        user.updatePassword(p).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.i(TAG, "eeeeee: " + e);
+                            }
+                        })
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getActivity().getApplicationContext(), "Password Update succeed", Toast.LENGTH_SHORT).show();
+                                    show.dismiss();
+                                }else {
+                                    Toast.makeText(getActivity().getApplicationContext(), "Updated Password Failed!!", Toast.LENGTH_SHORT).show();
+
+                                }
+                            }
+                        });
+
+                    }else {
+                        Toast.makeText(getActivity().getApplicationContext(), "Please enter same password longer than 6", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
+
+
+
 
 
 
@@ -197,7 +256,7 @@ public class AccountFragment extends Fragment {
 
 
 
-    private void saveIcon() {
+    private void saveIcon(FirebaseUser currentUser) {
         String[] filename = currIconPath.split("\\.");
         BitmapFactory.Options opts = new BitmapFactory.Options();
         Bitmap bm = BitmapFactory.decodeFile(currIconPath, opts);
@@ -206,7 +265,7 @@ public class AccountFragment extends Fragment {
         byte[] data = baos.toByteArray();
 
         // Upload image
-        String uuid = UUID.randomUUID().toString() + "-" + Calendar.getInstance().getTimeInMillis();
+        String uuid = currentUser.getUid();
         StorageReference uploadRef = storageRef.child("icons/" + uuid + "." + filename[filename.length - 1]);
         UploadTask uploadTask = uploadRef.putBytes(data);
 
@@ -230,6 +289,7 @@ public class AccountFragment extends Fragment {
                 } else {
                     // Handle failures
                     // ...
+                    Log.i(TAG, "SaveIcon failed");
                 }
             }
         });
@@ -243,6 +303,8 @@ public class AccountFragment extends Fragment {
                 .setPhotoUri(photoUrl)
                 .build();
 
+//        user.updatePassword("222222");
+
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -254,6 +316,9 @@ public class AccountFragment extends Fragment {
                             Log.i(TAG, "Display Name = " + user.getDisplayName());
                             Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
                             Toast.makeText(getActivity().getApplicationContext(), "User Profile Updated Successes!!", Toast.LENGTH_SHORT).show();
+                            displayNameView.clearFocus();
+                        }else {
+                            Toast.makeText(getActivity().getApplicationContext(), "Updated Failed!!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

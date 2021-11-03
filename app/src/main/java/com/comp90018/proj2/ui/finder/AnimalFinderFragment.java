@@ -46,6 +46,8 @@ import java.util.Collections;
 
 public class AnimalFinderFragment extends Fragment {
 
+    private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
+
     // store items
     private ArrayList<CardItem> cardItemArrayList = new ArrayList<>();
     private View view;
@@ -179,10 +181,12 @@ public class AnimalFinderFragment extends Fragment {
                                                                     .getTimestamp("PostTime");
                                                             String postType = documentSnapshot
                                                                     .getString("PostType");
-                                                            String postUserid = documentSnapshot
-                                                                    .getString("UserId");
-                                                            String postFlag = documentSnapshot
-                                                                    .getString("PostFlag");
+                                                            String postUserName = documentSnapshot
+                                                                    .getString("UserDisplayName");
+                                                            String postUserHeadIcon = documentSnapshot
+                                                                    .getString("UserPhotoUri");
+                                                            int postFlag = Math.toIntExact(documentSnapshot
+                                                                    .getLong("PostFlag"));
                                                             GeoPoint postGeoPoint = documentSnapshot
                                                                     .getGeoPoint("PostLocation");
                                                             String postImg = documentSnapshot
@@ -193,15 +197,14 @@ public class AnimalFinderFragment extends Fragment {
 
                                                             // set data
                                                             CardItem cardItem = new CardItem();
-                                                            cardItem.setImg(storage.getReferenceFromUrl(postImg));
-                                                            cardItem.setHeadsIcon(R.drawable.ic_card_portrait);
-                                                            cardItem.setTitles(postTitle);
-                                                            cardItem.setUsernames("test");
+                                                            cardItem.setImg(storage.getReferenceFromUrl(PREFIX+postImg));
+                                                            cardItem.setHeadIcon(storage.getReferenceFromUrl(postUserHeadIcon));                                                            cardItem.setTitles(postTitle);
+                                                            cardItem.setUsernames(postUserName);
                                                             cardItem.setPoint(postGeoPoint);
                                                             cardItem.setPostId(postId);
                                                             cardItem.setPostTime(postTime);
-                                                            cardItem.setPostFlag(Integer.parseInt(postFlag));
-
+                                                            cardItem.setPostFlag(postFlag);
+                                                            cardItem.setPostSpecies(postSpecies);
                                                             cardItem.setPostType(postType);
                                                             if(postType.equalsIgnoreCase("Animal")){
                                                             cardItemArrayList.add(cardItem);}
@@ -250,7 +253,7 @@ public class AnimalFinderFragment extends Fragment {
         private Context context;
         private GeoPoint current;
         private ArrayList<CardItem> cardItemArrayList;
-        private DecimalFormat df = new DecimalFormat("0.00");
+        private DecimalFormat df = new DecimalFormat("0.0");
 
         public HomeAdapter(Context context, ArrayList<CardItem> cardItemArrayList, GeoPoint current) {
             this.context = context;
@@ -276,7 +279,6 @@ public class AnimalFinderFragment extends Fragment {
             CardItem cardData = cardItemArrayList.get(position);
             //holder.img.setImageResource(cardData.getImg());
             holder.title.setText(cardData.getTitles());
-            holder.head.setImageResource(cardData.getHeadsIcon());
             holder.username.setText(cardData.getUsernames());
             holder.distance.setText(df.format(GeoPointUtils.calDistance(current, cardData.getPoint())) + " km");
             GlideApp
@@ -284,6 +286,11 @@ public class AnimalFinderFragment extends Fragment {
                     .load(cardData.getImg())
                     .centerCrop()
                     .into(holder.img);
+            GlideApp
+                    .with(context)
+                    .load(cardData.getHeadIcon())
+                    .centerCrop()
+                    .into(holder.head);
             Log.e("Loading", String.valueOf(cardData.getImg()));
 
 

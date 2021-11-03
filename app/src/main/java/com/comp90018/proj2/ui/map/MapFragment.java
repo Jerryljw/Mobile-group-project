@@ -77,6 +77,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
@@ -176,12 +177,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                                 Timestamp postTime = document.getTimestamp("PostTime");
                                 String postType = document.getString("PostType");
                                 String postUserid = document.getString("UserId");
-                                String postFlag = document.getString("PostFlag");
+                                int postFlag = Math.toIntExact(document.getLong("PostFlag"));
                                 GeoPoint postGeoPoint = document.getGeoPoint("PostLocation");
                                 String postImg = document.getString("PostImage");
                                 String postTitle = document.getString("PostTitle");
                                 String postMessage = document.getString("PostMessage");
-                                String userDisplayName = document.getString("UserDisplayname");
+                                String userDisplayName = document.getString("UserDisplayName");
+                                String userHeadIcon = document.getString("UserPhotoUri");
                                 GeoPoint postLocation = (GeoPoint) document.getData().get("PostLocation");
 
                                 CardItem cardItem = new CardItem();
@@ -189,9 +191,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                                 cardItem.setPostTime(postTime);
                                 cardItem.setPostType(postType);
                                 cardItem.setUserId(postUserid);
-                                cardItem.setPostFlag(Integer.parseInt(postFlag));
+                                cardItem.setPostFlag(postFlag);
                                 cardItem.setPoint(postGeoPoint);
                                 cardItem.setTitles(postTitle);
+                                cardItem.setPostSpecies(postSpecies);
 
                                 if (userDisplayName == null || userDisplayName.isEmpty()) {
                                     cardItem.setUsernames("User-" + postUserid);
@@ -200,10 +203,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                                 }
                                 cardItem.setPostMessage(postMessage);
 
-                                StorageReference gsReference = firebaseStorage.getReferenceFromUrl(postImg);
+                                StorageReference gsReference = firebaseStorage.getReferenceFromUrl(PREFIX+postImg);
                                 cardItem.setImg(gsReference);
 
-                                postList.add(cardItem);
+                                gsReference = firebaseStorage.getReferenceFromUrl(userHeadIcon);
+                                cardItem.setHeadIcon(gsReference);
+
+                                //postList.add(cardItem);
                                 mapViewModel.addPost(postId, cardItem);
 
                                 if (postLocation != null) {
@@ -493,6 +499,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                     .centerCrop()
                     .listener(new MarkerCallback(marker))
                     .into(postImg);
+            Glide.with(view.getContext())
+                    .load(post.getHeadIcon())
+                    .centerCrop()
+                    .listener(new MarkerCallback(marker))
+                    .into(userImg);
             title.setText(post.getTitles());
             username.setText(post.getUsernames());
         }
