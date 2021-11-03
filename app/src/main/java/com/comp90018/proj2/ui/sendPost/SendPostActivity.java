@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,7 +20,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +31,6 @@ import com.comp90018.proj2.MainActivity;
 import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySendPostBinding;
 import com.comp90018.proj2.ui.photo.GlideEngine;
-import com.comp90018.proj2.ui.post.PostActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -75,16 +74,17 @@ public class SendPostActivity extends AppCompatActivity {
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+
+    // Initialize
+    private final String TAG = "SendPostActivity";
     /**
-     * photos
+     * Auth
      */
-    private final ArrayList<Photo> selectedPhotoList = new ArrayList<>();
-    /**
-     * Adview is loaded over or not
-     */
-    private final boolean photosAdLoaded = false;
-    private final boolean albumItemsAdLoaded = false;
-    private final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private final StorageReference storageRef = storage.getReference();
+
     // Fields
     ImageButton newImageButton;
     ImageButton bUpdateLocation;
@@ -96,10 +96,9 @@ public class SendPostActivity extends AppCompatActivity {
     EditText tPostSpecies;
     Button bSendPost;
     ProgressBar loadingProgressBar;
-    // Initialize
-    private final String TAG = "SendPostActivity";
     private SendPostViewModel sendPostViewModel;
     private ActivitySendPostBinding binding;
+
     /**
      * Adview for picture list and album item list
      */
@@ -108,13 +107,7 @@ public class SendPostActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location lastKnownLocation;
     private boolean locationPermissionGranted = false;
-    /**
-     * Auth
-     */
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final FirebaseStorage storage = FirebaseStorage.getInstance();
-    private final StorageReference storageRef = storage.getReference();
+    private double MAX_SIZE = 400.00;
 
 
     @Override
@@ -320,6 +313,28 @@ public class SendPostActivity extends AppCompatActivity {
         bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
 
+        double mid = (double) data.length / 1024;
+        Log.i(TAG, "Bitmap size: " + data.length);
+        Log.i(TAG, "Bitmap size: " + (double) data.length);
+        Log.i(TAG, "Bitmap size: " + mid);
+
+        int quality = 100;
+
+        while (mid > MAX_SIZE) {
+            quality -= 10;
+            Log.i(TAG, "Exceed max size");
+
+            double i = mid / MAX_SIZE;
+
+            Log.i(TAG, bm.getWidth() + " -> " + bm.getWidth() / Math.sqrt(i));
+            bm = zoomImage(bm, bm.getWidth() / Math.sqrt(i), bm.getHeight() / Math.sqrt(i));
+            baos.reset();
+            bm.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+            data = baos.toByteArray();
+            Log.i(TAG, "Zoomed Bitmap size: " + data.length);
+            mid = (double) data.length / 1024;
+        }
+
         // Upload image
         String uuid = UUID.randomUUID().toString() + "-" + Calendar.getInstance().getTimeInMillis();
         StorageReference uploadRef = storageRef.child("images/" + uuid + "." + filename[filename.length - 1]);
@@ -362,7 +377,7 @@ public class SendPostActivity extends AppCompatActivity {
         postDto.put("UserPhotoUri", (mAuth.getCurrentUser() == null || mAuth.getCurrentUser().getPhotoUrl() == null) ?
                 "" : mAuth.getCurrentUser().getPhotoUrl().toString());
         postDto.put("UserId", mAuth.getUid());
-        
+
         db.collection("Post_Temp")
                 .add(postDto)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -482,5 +497,30 @@ public class SendPostActivity extends AppCompatActivity {
         };
 
         return afterTextChangedListener;
+    }
+
+    /**
+     * Helper method to zoom image
+     * @param bitmap original bitmap
+     * @param newWidth new width
+     * @param newHeight new height
+     * @return zoomed bitmap
+     * The method references the code from: https://blog.csdn.net/tf576776047/article/details/8143456
+     */
+    private Bitmap zoomImage(Bitmap bitmap, double newWidth, double newHeight) {
+        // Get original width and height
+        float width = bitmap.getWidth();
+        float height = bitmap.getHeight();
+
+        // Calculate how many scale to zoom
+        Matrix matrix = new Matrix();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // Zoom image
+        matrix.postScale(scaleWidth, scaleHeight);
+        Bitmap zoomedBitmap = Bitmap.createBitmap(bitmap, 0, 0, (int) width,
+                (int) height, matrix, true);
+        return zoomedBitmap;
     }
 }
