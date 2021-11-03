@@ -11,6 +11,15 @@ public class CardItem {
     private String postId;
 
     private StorageReference img;
+    private String imgUrl;
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
     public StorageReference getHeadIcon() {
         return headIcon;
