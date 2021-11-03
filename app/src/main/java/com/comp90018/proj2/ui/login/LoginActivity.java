@@ -198,6 +198,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showLoginFailed() {
-        Toast.makeText(getApplicationContext(), R.string.invalid_password, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.error_password, Toast.LENGTH_SHORT).show();
     }
 }
