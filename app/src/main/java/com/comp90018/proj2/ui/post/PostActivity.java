@@ -129,7 +129,11 @@ public class PostActivity extends AppCompatActivity {
                     String uid = firebaseUser.getUid();
                     String uname;
                     if (firebaseUser.getDisplayName().equals("")) {
-                        uname = "user-" + firebaseUser.getUid();
+                        if(firebaseUser.getUid().length()>6){
+                            uname = "user-" + firebaseUser.getUid().substring(0,5)+"...";
+                        }else {
+                            uname = "user-unknown";
+                        }
                     } else {
                         uname = firebaseUser.getDisplayName();
                     }
