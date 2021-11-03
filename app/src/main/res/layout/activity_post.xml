@@ -67,12 +67,12 @@
             app:layout_constraintTop_toBottomOf="@+id/post_img" />
 
         <Button
+            android:id="@+id/locate_post_button"
             android:layout_width="91dp"
             android:layout_height="54dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:text="Locate"
-            android:id="@+id/locate_post_button"
             app:layout_constraintBottom_toBottomOf="@+id/post_title_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -94,6 +94,18 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/post_title_view" />
+
+        <TextView
+            android:id="@+id/speciesTextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Loading Specie"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/locate_post_button"
+            app:layout_constraintBottom_toTopOf="@id/post_textview"/>
 
         <TextView
             android:textSize="12sp"
@@ -190,5 +202,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/comment_edit_multiline_text"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView >

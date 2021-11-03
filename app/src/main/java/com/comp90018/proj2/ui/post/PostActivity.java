@@ -84,7 +84,7 @@ public class PostActivity extends AppCompatActivity {
     ImageView imgPost,imgUserPost,currentUserHeadicon;
     GeoPoint postLocation;
 
-    TextView txtPostDesc, txtPostUsername,txtPostTitle;
+    TextView txtPostDesc, txtPostUsername,txtPostTitle,txtPostSpecie;
     EditText editTextComment;
     Button btnAddComment, locatePostButton;
     String PostKey;
@@ -131,6 +131,7 @@ public class PostActivity extends AppCompatActivity {
         txtPostTitle = findViewById(R.id.post_title_view);
         txtPostDesc = findViewById(R.id.post_textview);
         txtPostUsername = findViewById(R.id.post_username);
+        txtPostSpecie = findViewById(R.id.speciesTextview);
 
         editTextComment = findViewById(R.id.comment_edit_multiline_text);
         btnAddComment =findViewById(R.id.comment_button);
@@ -243,6 +244,15 @@ public class PostActivity extends AppCompatActivity {
                     else{
                         txtPostUsername.setText((String)dataMap.get("UserDisplayname"));
                     }
+                    //loading species by ai model
+                    String post_species = (String) dataMap.get("PostSpecies");
+                    if(post_species.equals("")){
+                        txtPostSpecie.setText("");
+                    }
+                    else {
+                        txtPostSpecie.setText("Possible species:"+post_species);
+                    }
+
 
                     GlideApp.with(getApplication())
                             .load(String.valueOf(firebaseUser.getPhotoUrl()))
