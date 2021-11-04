@@ -175,12 +175,12 @@ public class LoginActivity extends AppCompatActivity {
         // [END sign_up_click_listener]
 
         // Display the app logo
-        GlideApp.with(getApplication())
-                .load("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com" +
-                        "/o/Luora.png?alt=media&token=0a004bd2-9c1e-434f-8749-fecee60c38ba")
-                .apply(new RequestOptions()
-                        .fitCenter())
-                .into(logoImage);
+//        GlideApp.with(getApplication())
+//                .load("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com" +
+//                        "/o/Luora.png?alt=media&token=0a004bd2-9c1e-434f-8749-fecee60c38ba")
+//                .apply(new RequestOptions()
+//                        .fitCenter())
+//                .into(logoImage);
 
         // When the page is created, hide the loading
         loading.hide();

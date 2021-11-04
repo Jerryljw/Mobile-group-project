@@ -21,7 +21,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="LOGO" />
+        android:contentDescription="LOGO"
+        app:srcCompat="@drawable/luora_icon"/>
 
     <Button
         android:id="@+id/login"
