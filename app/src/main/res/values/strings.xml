@@ -15,6 +15,7 @@
     <string name="invalid_display_name">Not a valid display name</string>
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
+    <string name="error_password">Your password is wrong, please check.</string>
     <string name="login_failed">"Login failed"</string>
     <string name="action_log_out">Logout</string>
 

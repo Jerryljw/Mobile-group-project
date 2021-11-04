@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.comp90018.proj2.ui.login.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * 开屏页
@@ -14,6 +15,8 @@ import com.comp90018.proj2.ui.login.LoginActivity;
 public class SplashActivity extends Activity {
 
     private static final int sleepTime = 2000;
+
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle arg0) {
@@ -38,7 +41,11 @@ public class SplashActivity extends Activity {
                     }
                 }
                 //进入主页面
-                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                if (mAuth.getCurrentUser() == null) {
+                    startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                } else {
+                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                }
                 finish();
             }
         }).start();

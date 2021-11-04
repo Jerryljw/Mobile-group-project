@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,6 +31,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
@@ -48,6 +51,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -58,6 +62,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,6 +211,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
                                 StorageReference gsReference = firebaseStorage.getReferenceFromUrl(PREFIX+postImg);
                                 cardItem.setImg(gsReference);
+                                Task<Uri> downloadUrl = gsReference.getDownloadUrl();
+                                downloadUrl.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(@NonNull Uri uri) {
+                                        cardItem.setImgUrl(uri.toString());
+                                    }
+                                });
 
                                 gsReference = firebaseStorage.getReferenceFromUrl(userHeadIcon);
                                 cardItem.setHeadIcon(gsReference);
@@ -493,12 +506,34 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
             // update view
             String postId = (String) marker.getTag();
             CardItem post = mapViewModel.getPost(postId);
-
-            Glide.with(view.getContext())
-                    .load(post.getImg())
+            Log.d(TAG, "render: url " + post.getImg().getBucket());
+//            Glide.with(view.getContext())
+//                    .load(post.getImg())
+//                    .centerCrop()
+//                    .fallback(R.drawable.ic_card_image)
+//                    .error(R.drawable.ic_card_image)
+//                    .thumbnail(0.1f)
+//                    .listener(new MarkerCallback(marker))
+//                    .into(postImg);
+            Picasso.get()
+                    .load(post.getImgUrl())
+                    .fit()
                     .centerCrop()
-                    .listener(new MarkerCallback(marker))
-                    .into(postImg);
+                    .placeholder(R.drawable.ic_card_image)
+                    .into(postImg, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            if (marker.isInfoWindowShown()) {
+                                marker.hideInfoWindow();
+                                marker.showInfoWindow();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d(TAG, "onError: " + e.getMessage());
+                        }
+                    });
             Glide.with(view.getContext())
                     .load(post.getHeadIcon())
                     .centerCrop()
@@ -518,12 +553,14 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
             private void onSuccess() {
                 if (marker != null && marker.isInfoWindowShown()) {
+                    marker.hideInfoWindow();
                     marker.showInfoWindow();
                 }
             }
 
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                Log.d(TAG, "onLoadFailed: Error loading");
                 return false;
             }
 
