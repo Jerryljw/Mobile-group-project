@@ -34,40 +34,48 @@ import com.google.firebase.firestore.GeoPoint;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+/**
+ * The main activity for the application
+ */
 public class MainActivity extends AppCompatActivity implements LocationCommunication, SensorEventListener {
-// implements LocationCommunication to share the location with child fragments
     private ActivityMainBinding binding;
     private String TAG = "MainActivity";
 
-    //shakeshake's bianliang
+    // For Shake-shake
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
     private static final int SHAKE_THRESHOLD = 600;
     private boolean bb = false;
-
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
 
     // get user's current location
     private GeoPoint current;
+    // implements LocationCommunication to share the location with child fragments
     private LocationManager lm;
 
+    /**
+     * Override the onCreate method
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Get the location
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationUpdate();
 
-        //shakeshake
+        // Initialize sensors
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
 
+        // Initialize the view
         Log.i(TAG, "onCreate: ");
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Initialize the main bottom navigation
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -76,14 +84,12 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 
-        // check if come from the Post Location Button
+        // Check if come from the Post Location Button
         if(getIntent().getIntExtra("fromLocationToMap",0)==1){
-
             NavInflater navInflater = navController.getNavInflater();
             NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
             navGraph.setStartDestination(R.id.navigation_map);
             navController.setGraph(navGraph, getIntent().getExtras());
-
         }
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -109,10 +115,13 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
             current = locationCvtGeo(location);
         }
 
+        /**
+         * Get user's location
+         */
         @SuppressLint("WrongConstant")
         @Override
         public void onProviderEnabled(@NonNull String provider) {
-            if ( checkCallingOrSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (checkCallingOrSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivity.this,"Please Enable your GPS.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivityForResult(intent, 0);
@@ -127,9 +136,11 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
                 current = locationCvtGeo(temp);
             }
         }
-        
-        public void onProviderDisabled(String provider) {
 
+        /**
+         * If the location is not permitted
+         */
+        public void onProviderDisabled(String provider) {
             // default location
             current = new GeoPoint(-34, 151);
         }
@@ -191,7 +202,10 @@ public class MainActivity extends AppCompatActivity implements LocationCommunica
 
     }
 
-
+    /**
+     * Handlers for sensor changed event
+     * @param sensorEvent the sensor event
+     */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         Sensor mySensor = sensorEvent.sensor;

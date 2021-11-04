@@ -2,6 +2,9 @@ package com.comp90018.proj2.ui.login;
 
 import androidx.annotation.Nullable;
 
+/**
+ * The state of login form
+ */
 public class LoginFormState {
 
     @Nullable

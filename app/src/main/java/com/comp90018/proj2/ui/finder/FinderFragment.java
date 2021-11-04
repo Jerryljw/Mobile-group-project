@@ -18,7 +18,9 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Fragment for finder
+ */
 public class FinderFragment extends Fragment {
     TabLayout mTableLayout;
     private ViewPager mViewPager;

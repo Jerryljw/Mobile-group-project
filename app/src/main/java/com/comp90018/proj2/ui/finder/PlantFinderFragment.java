@@ -44,32 +44,32 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Fragment for plant finer
+ */
 public class PlantFinderFragment extends Fragment {
-
-    private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
-    // store items
-    private ArrayList<CardItem> cardItemArrayList = new ArrayList<>();
-    private View view;
-    private RecyclerView recyclerView;
-    private HomeAdapter homeAdapter;
-
-    // Upper Tab
-    private Spinner spinner;
-    private String sp_item;
 
     private static final String TAG = "Extract";
 
-    // read data from firebase
-    private FirebaseFirestore firestore_db = FirebaseFirestore.getInstance();
-    private CollectionReference firestore_reference = firestore_db.
-            collection("Post_Temp");
-
+    // Prefix for files in Firebase Storage
+    private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
     FirebaseStorage storage = FirebaseStorage.getInstance();
-
-    private GeoPoint current;
-
-    // get the user current location
+    // LocationCommunication to get the user current location
     LocationCommunication mLocationCallback;
+    // Store items
+    private final ArrayList<CardItem> cardItemArrayList = new ArrayList<>();
+    private View view;
+    private RecyclerView recyclerView;
+    private HomeAdapter homeAdapter;
+    // Upper Tab
+    private Spinner spinner;
+    private String sp_item;
+    // Read data from firebase
+    private final FirebaseFirestore firestore_db = FirebaseFirestore.getInstance();
+    private final CollectionReference firestore_reference = firestore_db.
+            collection("Post_Temp");
+    // The current location in GeoPoint
+    private GeoPoint current;
 
     @Override
     public void onAttach(Context context) {
@@ -87,6 +87,7 @@ public class PlantFinderFragment extends Fragment {
         // Log.e("Animal Current onAttach", String.valueOf(current));
     }
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -97,7 +98,7 @@ public class PlantFinderFragment extends Fragment {
         loadCardItemFromFirebase();
 
         // sorting list button
-        spinner = (Spinner) view.findViewById(R.id.plant_sp);
+        spinner = view.findViewById(R.id.plant_sp);
         sp_item = (String) spinner.getSelectedItem();
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -137,7 +138,7 @@ public class PlantFinderFragment extends Fragment {
      * Initialize the view in nested fragment
      */
     private void initRecycleView() {
-        recyclerView = (RecyclerView) view.findViewById(R.id.home_item);
+        recyclerView = view.findViewById(R.id.home_item);
         homeAdapter = new HomeAdapter(getActivity(), cardItemArrayList, current);
 
         // set format of view, 2 cols
@@ -150,7 +151,6 @@ public class PlantFinderFragment extends Fragment {
             public void OnItemClick(View view, CardItem cardItem) {
 
                 // jump to post activity
-                // TODO: need to pass postId to PostActivity
                 Intent intent = new Intent(getActivity(), PostActivity.class);
                 Bundle bundle = new Bundle();
                 Log.e(TAG, String.valueOf(cardItem.getPostId()));
@@ -210,7 +210,7 @@ public class PlantFinderFragment extends Fragment {
 
                                                             // set data
                                                             CardItem cardItem = new CardItem();
-                                                            cardItem.setImg(storage.getReferenceFromUrl(PREFIX+postImg));
+                                                            cardItem.setImg(storage.getReferenceFromUrl(PREFIX + postImg));
                                                             cardItem.setHeadIcon(storage.getReferenceFromUrl(postUserHeadIcon));
                                                             cardItem.setTitles(postTitle);
                                                             cardItem.setUsernames(postUserName);
@@ -220,9 +220,10 @@ public class PlantFinderFragment extends Fragment {
                                                             cardItem.setPostFlag(postFlag);
                                                             cardItem.setPostType(postType);
                                                             cardItem.setPostSpecies(postSpecies);
-                                                            Log.e("PostType",postType);
-                                                            if(postType.equalsIgnoreCase("Plant")){
-                                                                cardItemArrayList.add(cardItem);}
+                                                            Log.e("PostType", postType);
+                                                            if (postType.equalsIgnoreCase("Plant")) {
+                                                                cardItemArrayList.add(cardItem);
+                                                            }
 
                                                             // refresh view
                                                             homeAdapter = new HomeAdapter(getActivity(),
@@ -267,16 +268,16 @@ public class PlantFinderFragment extends Fragment {
 
     // inner adapter class
     static class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MyViewHolder> {
-        private Context context;
-        private ArrayList<CardItem> cardItemArrayList;
+        private final Context context;
+        private final ArrayList<CardItem> cardItemArrayList;
 
         // for click card item
         private OnItemClickListener onItemClickListener;
 
 
         // show current location and format to 2 decimal places
-        private GeoPoint current;
-        private DecimalFormat df = new DecimalFormat("0.0");
+        private final GeoPoint current;
+        private final DecimalFormat df = new DecimalFormat("0.0");
 
         public HomeAdapter(Context context, ArrayList<CardItem> cardItemArrayList, GeoPoint current) {
             this.context = context;
@@ -334,6 +335,14 @@ public class PlantFinderFragment extends Fragment {
             return cardItemArrayList.size();
         }
 
+        public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+            this.onItemClickListener = onItemClickListener;
+        }
+
+        // need to be overwritten in adapter, enable to click item
+        public interface OnItemClickListener {
+            void OnItemClick(View view, CardItem cardItem);
+        }
 
         // inner class
         class MyViewHolder extends RecyclerView.ViewHolder {
@@ -360,15 +369,6 @@ public class PlantFinderFragment extends Fragment {
                     }
                 });
             }
-        }
-
-        // need to be overwrited in adapter, enable to click item
-        public interface OnItemClickListener {
-            void OnItemClick(View view, CardItem cardItem);
-        }
-
-        public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-            this.onItemClickListener = onItemClickListener;
         }
     }
 

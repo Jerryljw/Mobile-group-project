@@ -4,6 +4,9 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.StorageReference;
 
+/**
+ * Card item for RecycleView in Finder
+ */
 public class CardItem {
 
     // TODO: userid contains all

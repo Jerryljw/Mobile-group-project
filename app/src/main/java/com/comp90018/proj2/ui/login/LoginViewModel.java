@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel;
 
 import com.comp90018.proj2.R;
 
+/**
+ * View model for Login
+ */
 public class LoginViewModel extends ViewModel {
 
     private String TAG = "LoginViewModel";
@@ -20,8 +23,13 @@ public class LoginViewModel extends ViewModel {
         return loginFormState;
     }
 
-
+    /**
+     * Method for user input validation
+     * @param username input username
+     * @param password input password
+     */
     public void loginDataChanged(String username, String password) {
+        // If the input is invalid, set the error to the form state
         if (!isUserNameValid(username)) {
             loginFormState.setValue(new LoginFormState(R.string.invalid_email, null));
         } else if (!isPasswordValid(password)) {
@@ -31,6 +39,11 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Method for checking username
+     * @param username input username
+     * @return valid - true; invalid - false
+     */
     private boolean isUserNameValid(String username) {
         if (username == null) {
             return false;
@@ -42,7 +55,11 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
-    // A placeholder password validation check
+    /**
+     * Method for checking password
+     * @param password input password
+     * @return valid - true; invalid - false
+     */
     private boolean isPasswordValid(String password) {
         return password != null && password.trim().length() > 5;
     }

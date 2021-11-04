@@ -25,15 +25,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Activity for collecting feedback from end user
+ */
 public class FeedbackActivity extends AppCompatActivity {
 
     private final String TAG = "FeedbackActivity";
 
+    // Firebase instances
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final StorageReference storageRef = storage.getReference();
 
+    /**
+     * Override the onCreate method
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

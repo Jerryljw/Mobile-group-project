@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel;
 
 import com.comp90018.proj2.R;
 
+/**
+ * View model for SendPost
+ */
 public class SendPostViewModel extends ViewModel {
     private String TAG = "SendPostViewModel";
 
@@ -40,11 +43,22 @@ public class SendPostViewModel extends ViewModel {
         this.species.setValue(species);
     }
 
+    /**
+     * Validate data when location changed
+     * @param latitude latitude
+     * @param longitude longitude
+     */
     public void updateLocation(double latitude, double longitude) {
         this.longitude.setValue(String.valueOf(longitude));
         this.latitude.setValue(String.valueOf(latitude));
     }
 
+    /**
+     * Validate data when text fields changed
+     * @param image input image
+     * @param title  input title
+     * @param message  input message
+     */
     public void formDataChanged(String image, String title, String message) {
         Log.i(TAG, "Image: " + image + "; Title: " + title + "; Message: " + message);
         if (isEmptyString(image)) {

@@ -2,6 +2,9 @@ package com.comp90018.proj2.ui.sendPost;
 
 import androidx.annotation.Nullable;
 
+/**
+ * The state of send post form
+ */
 public class SendPostFormState {
 
     @Nullable

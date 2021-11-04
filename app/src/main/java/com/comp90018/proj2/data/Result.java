@@ -1,5 +1,9 @@
 package com.comp90018.proj2.data;
 
+/**
+ * Common Utils for request result
+ * @param <T>
+ */
 public class Result<T> {
     // hide the private constructor to limit subclass types (Success, Error)
     private Result() {

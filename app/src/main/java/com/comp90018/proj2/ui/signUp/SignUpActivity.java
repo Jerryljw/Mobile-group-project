@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySignUpBinding;
 import com.comp90018.proj2.ui.photo.GlideEngine;
 import com.google.android.gms.tasks.Continuation;
@@ -35,13 +35,16 @@ import com.google.firebase.storage.UploadTask;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Activity for user sign up
+ */
 public class SignUpActivity extends AppCompatActivity {
 
     // Initialize
@@ -60,7 +63,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText tEmail;
     private EditText tPassword;
     private EditText tDisplayName;
-    private ProgressBar loadingProgressBar;
+    private AVLoadingIndicatorView loading;
 
     // Icon path
     private String currIconPath;
@@ -80,12 +83,13 @@ public class SignUpActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate: ");
 
+        // Get the bindings of UI components
         bIcon = binding.buttonIcon;
         bSignup = binding.signUp;
         tEmail = binding.email;
         tPassword = binding.password;
         tDisplayName = binding.displayName;
-        loadingProgressBar = binding.loading;
+        loading = binding.loading;
 
         // Icon Button
         bIcon.setOnClickListener(v -> {
@@ -115,6 +119,7 @@ public class SignUpActivity extends AppCompatActivity {
             }
         };
 
+        // Add the listeners to proper fields
         tEmail.addTextChangedListener(afterTextChangedListener);
         tPassword.addTextChangedListener(afterTextChangedListener);
         tDisplayName.addTextChangedListener(afterTextChangedListener);
@@ -140,22 +145,26 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
 
-        // Sign Up
+        // Add click listener for signing up
         bSignup.setOnClickListener(v -> {
             Log.i(TAG, "onClick: ");
-            loadingProgressBar.setVisibility(View.VISIBLE);
+            loading.show();
 
             // [START sign up]
             signUp();
             // [END sign up]
-
-            loadingProgressBar.setVisibility(View.INVISIBLE);
         });
 
-
+        // When the page is created, hide the loading
+        loading.hide();
     }
 
+    /**
+     * Method to save selected avatar to firebase
+     * @param userId currently logged in user
+     */
     private void saveIcon(String userId) {
+        // Load image
         String[] filename =  currIconPath.split("\\.");
         BitmapFactory.Options opts = new BitmapFactory.Options();
         Bitmap bm = BitmapFactory.decodeFile(currIconPath, opts);
@@ -186,31 +195,18 @@ public class SignUpActivity extends AppCompatActivity {
 //                    iconUri = task.getResult().getPath();
                     updateUserProfile(task.getResult());
                 } else {
-                    // Handle failures
-                    // ...
+                    loading.hide();
+                    Toast.makeText(getApplicationContext(), R.string.error_sign_up, Toast.LENGTH_LONG).show();
+
                 }
             }
         });
 
-
-//        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//            @Override
-//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                if (taskSnapshot.getMetadata() != null) {
-//                    Log.i(TAG, taskSnapshot.getMetadata().getPath());
-//                    iconUri = taskSnapshot.getMetadata().getPath();
-//                } else {
-//                    Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception exception) {
-//                Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
-//            }
-//        });
     }
 
+    /**
+     * Method to sign up
+     */
     private void signUp() {
         String email = tEmail.getText().toString();
         String password = tPassword.getText().toString();
@@ -231,8 +227,10 @@ public class SignUpActivity extends AppCompatActivity {
                                 Log.i(TAG, "Expected Uri = " + iconUri);
 
                                 if (currIconPath != null && !"".equals(currIconPath)) {
+                                    // If the user selected avatar, save the icon first
                                     saveIcon(user.getUid());
                                 } else {
+                                    // If the user doesn't select avatar, use the default image
                                     updateUserProfile(Uri.parse("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com/" +
                                             "o/icons%2Fvecteezypeople-business-avatarpp0421_generated.jpg?alt=media" +
                                             "&token=fd8edb77-c9a1-4e07-862c-8a88d0f82261"));
@@ -249,6 +247,10 @@ public class SignUpActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Update the registered user's display name and photo
+     * @param photoUrl the url for avatar
+     */
     private void updateUserProfile(Uri photoUrl) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) return;
@@ -269,12 +271,16 @@ public class SignUpActivity extends AppCompatActivity {
                             Log.i(TAG, "Display Name = " + user.getDisplayName());
                             Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
                         }
+                        loading.hide();
                     }
                 });
         finish();
     }
+
+    /**
+     * Method to popup EasyPhotos to select avatar image
+     */
     private void selectImage() {
-//        Intent intent = new Intent(SendPostActivity.this, PhotoActivity.class);
         EasyPhotos.createAlbum(SignUpActivity.this, true, false, GlideEngine.getInstance())
                 .setFileProviderAuthority("com.comp90018.proj2.ui.photo.fileprovider")
                 .start(new SelectCallback() {
@@ -283,6 +289,7 @@ public class SignUpActivity extends AppCompatActivity {
                         currIconPath = photos.get(0).path;
                         Log.i(TAG, "selectCallBack: " + currIconPath);
 
+                        // Load the image and display it om the view
                         BitmapFactory.Options opts = new BitmapFactory.Options();
                         opts.inJustDecodeBounds = false;
                         opts.inSampleSize = 3;
@@ -295,7 +302,6 @@ public class SignUpActivity extends AppCompatActivity {
 
                     }
                 });
-//        startActivity(intent);
     }
 
 }

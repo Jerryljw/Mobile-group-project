@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * View model for account
+ */
 public class AccountViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public AccountViewModel() {
         mText = new MutableLiveData<>();
