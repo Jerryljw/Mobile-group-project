@@ -91,4 +91,5 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.kyleduo.switchbutton:library:2.1.0'
     implementation 'com.microsoft.design:fluent-system-icons:1.1.147@aar'
+    implementation 'com.wang.avi:library:2.1.3'
 }

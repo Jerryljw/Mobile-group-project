@@ -64,6 +64,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Activity for Send Post
+ */
 public class SendPostActivity extends AppCompatActivity {
 
     /**
@@ -76,15 +79,14 @@ public class SendPostActivity extends AppCompatActivity {
 
     // Initialize
     private final String TAG = "SendPostActivity";
-    /**
-     * Auth
-     */
+
+    // Firebase instances
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final StorageReference storageRef = storage.getReference();
 
-    // Fields
+    // UI components
     ImageButton newImageButton;
     ImageButton bUpdateLocation;
     EditText tPostLat;
@@ -98,14 +100,18 @@ public class SendPostActivity extends AppCompatActivity {
     private SendPostViewModel sendPostViewModel;
     private ActivitySendPostBinding binding;
 
-    /**
-     * Adview for picture list and album item list
-     */
+    // Adview for picture list and album item list
     private RelativeLayout photosAdView, albumItemsAdView;
+
+    // The path for the current image
     private String currentFilePath;
+
+    // Location
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Location lastKnownLocation;
     private boolean locationPermissionGranted = false;
+
+    // The maximum file size
     private double MAX_SIZE = 400.00;
 
 
@@ -114,37 +120,12 @@ public class SendPostActivity extends AppCompatActivity {
         super.onStart();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent intent1 = new Intent(SendPostActivity.this, MainActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putInt("fromLocationToMap", 1);
-        intent1.putExtras(bundle);
-        double latitude = sendPostViewModel.getLatitude().getValue() == null ?
-                -34 : Double.parseDouble(sendPostViewModel.getLatitude().getValue());
-        double longitude = sendPostViewModel.getLongitude().getValue() == null ?
-                151 : Double.parseDouble(sendPostViewModel.getLongitude().getValue());
-
-        bundle.putDouble("latitude", latitude);
-        bundle.putDouble("longitude", longitude);
-        intent1.putExtras(bundle);
-        startActivity(intent1);
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar supportActionBar = getSupportActionBar();
         Objects.requireNonNull(supportActionBar).setDisplayHomeAsUpEnabled(true);
-//        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-//            @Override
-//            public void handleOnBackPressed() {
-//
-//            }
-//        };
-//        getOnBackPressedDispatcher().addCallback(this, callback);
-
 
         binding = ActivitySendPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -159,6 +140,7 @@ public class SendPostActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate: ");
 
+        // Get bindings of UI components
         newImageButton = binding.buttonNewImage;
         bUpdateLocation = binding.buttonUpdateLocation;
         tPostLat = binding.textPostLat;
@@ -170,13 +152,11 @@ public class SendPostActivity extends AppCompatActivity {
         bSendPost = binding.sendPost;
         loading = binding.loading;
 
-
         // Latitude & Longitude: onChange Validation
         TextWatcher locationTextWatcher = getLocationTextWatcher();
         tPostTitle.addTextChangedListener(locationTextWatcher);
         tPostMessage.addTextChangedListener(locationTextWatcher);
         tPostSpecies.addTextChangedListener(locationTextWatcher);
-
 
         // Latitude: add Observer
         sendPostViewModel.getLatitude().observe(this, tPostLat::setText);
@@ -187,7 +167,7 @@ public class SendPostActivity extends AppCompatActivity {
         // Post Species: add Observer
         sendPostViewModel.getSpecies().observe(this, tPostSpecies::setText);
 
-
+        // Add observer for post form state
         sendPostViewModel.getSendPostFormState().observe(this, sendPostFormState -> {
             if (sendPostFormState == null) {
                 return;
@@ -205,6 +185,7 @@ public class SendPostActivity extends AppCompatActivity {
             }
         });
 
+        // Disable the text fields
         tPostLon.setEnabled(false);
         tPostLat.setEnabled(false);
 
@@ -212,20 +193,17 @@ public class SendPostActivity extends AppCompatActivity {
         bSendPost.setOnClickListener(v -> {
             Log.i(TAG, "onClick: ");
             loading.show();
-//            loadingProgressBar.setVisibility(View.VISIBLE);
 
-            // Check image selected.
+            // Check if image selected.
             if (currentFilePath == null || "".equals(currentFilePath)) {
-//                sendPostViewModel.getSendPostFormState().setValue(
-//                        new SendPostFormState(R.string.invalid_post_image));
                 return;
             }
             // [START send post]
             post();
             // [END send post]
-
         });
 
+        // Add click listener for selecting new image
         newImageButton.setOnClickListener(v -> {
             Log.i(TAG, "onClick: newImageButton");
 
@@ -234,15 +212,19 @@ public class SendPostActivity extends AppCompatActivity {
             // [END select image]
         });
 
+        // Add click listener for updating location
         bUpdateLocation.setOnClickListener(v -> {
             getDeviceLocation();
         });
+
+        // When the page is created, hide the loading
         loading.hide();
     }
 
-
+    /**
+     * Method to popup EasyPhotos to select avatar image
+     */
     private void selectImage() {
-//        Intent intent = new Intent(SendPostActivity.this, PhotoActivity.class);
         EasyPhotos.createAlbum(SendPostActivity.this, true, false, GlideEngine.getInstance())
                 .setFileProviderAuthority("com.comp90018.proj2.ui.photo.fileprovider")
                 .start(new SelectCallback() {
@@ -251,12 +233,14 @@ public class SendPostActivity extends AppCompatActivity {
                         currentFilePath = photos.get(0).path;
                         Log.i(TAG, "selectCallBack: " + currentFilePath);
 
+                        // Load the image and display it om the view
                         BitmapFactory.Options opts = new BitmapFactory.Options();
                         opts.inJustDecodeBounds = false;
                         opts.inSampleSize = 3;
                         Bitmap bm = BitmapFactory.decodeFile(currentFilePath, opts);
                         newImageButton.setImageBitmap(bm);
 
+                        // Label the selected image through Google API
                         InputImage image = InputImage.fromBitmap(bm, 0);
                         ImageLabeler labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
 
@@ -264,16 +248,10 @@ public class SendPostActivity extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {
                                     @Override
                                     public void onSuccess(@NonNull List<ImageLabel> labels) {
-
-//                                        for (ImageLabel label : labels) {
-//                                            String text = label.getText();
-//                                            float confidence = label.getConfidence();
-//                                            int index = label.getIndex();
-//                                            Log.i(TAG, "Labeling: " + text + " " + confidence + " " + index);
-//                                        }
                                         if (labels.size() == 0) {
                                             Toast.makeText(getApplicationContext(), R.string.error_label, Toast.LENGTH_LONG).show();
                                         } else {
+                                            // Display the label to the view
                                             sendPostViewModel.setSpecies(labels.get(0).getText());
                                         }
                                     }
@@ -293,7 +271,6 @@ public class SendPostActivity extends AppCompatActivity {
 
                     }
                 });
-//        startActivity(intent);
     }
 
     /**
@@ -301,8 +278,6 @@ public class SendPostActivity extends AppCompatActivity {
      */
     private void post() {
         // [START send post to firebase]
-//        loading.setVisibility(View.VISIBLE);
-
         Log.i(TAG, "bSendPostButton: clicked");
 
         // Read image
@@ -313,6 +288,7 @@ public class SendPostActivity extends AppCompatActivity {
         bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
 
+        // Check the image size, if the size exceed maximum, then resize it
         double mid = (double) data.length / 1024;
         Log.i(TAG, "Bitmap size: " + data.length);
         Log.i(TAG, "Bitmap size: " + (double) data.length);
@@ -320,13 +296,15 @@ public class SendPostActivity extends AppCompatActivity {
 
         int quality = 100;
 
+        // Loop until reach the expected size
         while (mid > MAX_SIZE) {
             quality -= 10;
             Log.i(TAG, "Exceed max size");
 
             double i = mid / MAX_SIZE;
-
             Log.i(TAG, bm.getWidth() + " -> " + bm.getWidth() / Math.sqrt(i));
+
+            // Resize image
             bm = zoomImage(bm, bm.getWidth() / Math.sqrt(i), bm.getHeight() / Math.sqrt(i));
             baos.reset();
             bm.compress(Bitmap.CompressFormat.JPEG, quality, baos);
@@ -358,12 +336,15 @@ public class SendPostActivity extends AppCompatActivity {
                 loading.hide();
             }
         });
-//        loading.setVisibility(View.INVISIBLE);
         // [END send post to firebase]
     }
 
+    /**
+     * Method to save post to firebase store
+     * @param imagePath the image path
+     */
     private void sendPost2Firestore(String imagePath) {
-        // Test
+        // Create the dto
         Map<String, Object> postDto = new HashMap<>();
         postDto.put("PostImage", imagePath);
         postDto.put("PostFlag", 0);
@@ -380,6 +361,7 @@ public class SendPostActivity extends AppCompatActivity {
                 "" : mAuth.getCurrentUser().getPhotoUrl().toString());
         postDto.put("UserId", mAuth.getUid());
 
+        // Send dto to firebase
         db.collection("Post_Temp")
                 .add(postDto)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -402,7 +384,6 @@ public class SendPostActivity extends AppCompatActivity {
     /**
      * Enables the My Location layer if the fine location permission has been granted.
      */
-
     // [START maps_current_place_location_permission]
     private void getLocationPermission() {
         /*
@@ -423,6 +404,9 @@ public class SendPostActivity extends AppCompatActivity {
     // [END maps_current_place_location_permission]
 
 
+    /**
+     * Get the device location
+     */
     // [START maps_current_place_get_device_location]
     private void getDeviceLocation() {
         /*
@@ -478,6 +462,10 @@ public class SendPostActivity extends AppCompatActivity {
         Log.i(TAG, "onDestroy: ");
     }
 
+    /**
+     * Method to get location text watcher
+     * @return
+     */
     private TextWatcher getLocationTextWatcher() {
         TextWatcher afterTextChangedListener = new TextWatcher() {
 
@@ -524,5 +512,23 @@ public class SendPostActivity extends AppCompatActivity {
         Bitmap zoomedBitmap = Bitmap.createBitmap(bitmap, 0, 0, (int) width,
                 (int) height, matrix, true);
         return zoomedBitmap;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent1 = new Intent(SendPostActivity.this, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("fromLocationToMap", 1);
+        intent1.putExtras(bundle);
+        double latitude = sendPostViewModel.getLatitude().getValue() == null ?
+                -34 : Double.parseDouble(sendPostViewModel.getLatitude().getValue());
+        double longitude = sendPostViewModel.getLongitude().getValue() == null ?
+                151 : Double.parseDouble(sendPostViewModel.getLongitude().getValue());
+
+        bundle.putDouble("latitude", latitude);
+        bundle.putDouble("longitude", longitude);
+        intent1.putExtras(bundle);
+        startActivity(intent1);
+        return super.onOptionsItemSelected(item);
     }
 }

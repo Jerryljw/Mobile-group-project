@@ -35,6 +35,9 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.Objects;
 
+/**
+ * Activity for user login
+ */
 public class LoginActivity extends AppCompatActivity {
 
     // Initialize
@@ -43,13 +46,11 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
 
 
-    /**
-     * Auth
-     */
+    // Firebase Auth instances
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    // Fields
+    // UI components
     EditText usernameEditText;
     EditText passwordEditText;
     Button loginButton;
@@ -57,16 +58,17 @@ public class LoginActivity extends AppCompatActivity {
     AVLoadingIndicatorView loading;
     ImageView logoImage;
 
-
     @Override
     protected void onStart() {
         super.onStart();
+        // Add the listener for auth status
         mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        // Remove the listener for auth status
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
@@ -84,6 +86,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate: ");
 
+        // Get the bindings of UI components
         usernameEditText = binding.email;
         passwordEditText = binding.password;
         loginButton = binding.login;
@@ -91,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
         loading = binding.loading;
         logoImage = binding.logo;
 
-
+        // The listener for text changed event
         TextWatcher afterTextChangedListener = new TextWatcher() {
 
             @Override
@@ -106,49 +109,53 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                // After the EditText is changed, than update it to view model
                 loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
             }
         };
+        // Add the listeners to proper fields
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
 
+        // Add observer for form status
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
             public void onChanged(@Nullable LoginFormState loginFormState) {
                 if (loginFormState == null) {
                     return;
                 }
+                // Enable/Disable the login button based on form status
                 loginButton.setEnabled(loginFormState.isDataValid());
-//                if (loginFormState.getUsernameError() != null) {
-//                    usernameEditText.setError(getString(loginFormState.getUsernameError()));
-//                }
-//                if (loginFormState.getPasswordError() != null) {
-//                    passwordEditText.setError(getString(loginFormState.getPasswordError()));
-//                }
             }
         });
 
-        // [START auth_state_listener] ,this method execute as soon as there is a change in Auth status , such as user sign in or sign out.
+        // [START auth_state_listener]
+        // this method execute as soon as there is a change in Auth status , such as user sign in or sign out.
         mAuthListener = firebaseAuth -> {
             FirebaseUser user = firebaseAuth.getCurrentUser();
+
+            // Hide the loading progress bar
             loading.hide();
 
             if (user != null) {
                 Log.i(TAG, "Display Name = " + user.getDisplayName());
                 Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
 
+                // Update the UI
                 updateUiWithUser(user);
             } else {
                 // User is signed out
                 Log.d(TAG, "onAuthStateChanged:signed_out");
-//                showLoginFailed(null);
             }
         };
         // [END auth_state_listener]
 
+        // Add click listener for login button
         loginButton.setOnClickListener(v -> {
             Log.i(TAG, "onClick: ");
+
+            // Show the loading progress bar
             loading.show();
 
             // [START login]
@@ -157,15 +164,17 @@ public class LoginActivity extends AppCompatActivity {
 
         });
 
-        // [START sign_up_click_listener]
+        // Add click listener for signup navigation button
         signUpText.setOnClickListener(v -> {
             Log.i(TAG, "signUpText onClick: ");
 
+            // Start the SignUpActivity
             Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
             startActivity(intent);
         });
         // [END sign_up_click_listener]
 
+        // Display the app logo
         GlideApp.with(getApplication())
                 .load("https://firebasestorage.googleapis.com/v0/b/mobiletest-e36f3.appspot.com" +
                         "/o/Luora.png?alt=media&token=0a004bd2-9c1e-434f-8749-fecee60c38ba")
@@ -173,10 +182,17 @@ public class LoginActivity extends AppCompatActivity {
                         .fitCenter())
                 .into(logoImage);
 
+        // When the page is created, hide the loading
         loading.hide();
     }
 
+    /**
+     * Method for login
+     * @param email user's input email
+     * @param password user's input password
+     */
     private void login(String email, String password) {
+        // Validate input with Firebase Authentication
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -196,21 +212,30 @@ public class LoginActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             Log.e(TAG, "signInWithEmail: " + e.getMessage());
                         }
+                        loading.hide();
                     };
                 });
     }
 
+    /**
+     * Update the user based on user's stautus
+     * @param user logged in user
+     */
     private void updateUiWithUser(@NonNull FirebaseUser user) {
+        // Popup welcome message
         String welcome = getString(R.string.welcome) + user.getEmail();
-        // TODO : initiate successful logged in experience
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
 
+        // Start the MainActivity
         Intent intent = new Intent();
         intent.setClass(LoginActivity.this, MainActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Handle login failure
+     */
     private void showLoginFailed() {
-        Toast.makeText(getApplicationContext(), R.string.invalid_password, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.login_failed, Toast.LENGTH_SHORT).show();
     }
 }

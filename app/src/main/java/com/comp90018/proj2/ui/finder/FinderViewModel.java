@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+/**
+ * View model for Finder
+ */
 public class FinderViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;

@@ -3,7 +3,6 @@ package com.comp90018.proj2.ui.post;
 
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -41,18 +40,22 @@ import com.google.firebase.storage.StorageReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+/**
+ * Activity for Post
+ */
 public class PostActivity extends AppCompatActivity {
-    PostItem postItem;
-    ImageView imgPost,imgUserPost,currentUserHeadicon;
-    GeoPoint postLocation;
 
+    // UI components
+    PostItem postItem;
+    ImageView imgPost,imgUserPost, currentUserHeadIcon;
+    GeoPoint postLocation;
     TextView txtPostDesc, txtPostUsername,txtPostTitle,txtPostSpecie;
     EditText editTextComment;
     Button btnAddComment, locatePostButton;
@@ -64,15 +67,11 @@ public class PostActivity extends AppCompatActivity {
     RecyclerView RvComment;
     CommentAdapter commentAdapter;
     List<CommentItem> listComment;
-    static String COMMENT_KEY = "Comments" ;
+
+    // Constants
     private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
-
-
-
-    //static String POST_KEY = "Post";
-
+    static String COMMENT_KEY = "Comments" ;
     static String POST_KEY = "Post_Temp";
-
     static String COMMENT_CONTENT = "CommentContent";
     static String COMMENT_TIME = "CommentTime";
     static String COMMENT_USERHEADICON = "CommentUserHeadicon";
@@ -84,20 +83,22 @@ public class PostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
-        //initial values
+
+        // Initialize values
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
+        // Initialize firebase instances
         firebaseFirestore=FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         firebaseStorage = FirebaseStorage.getInstance();
-        //initial views
+
+        // Initialize views
         imgPost =findViewById(R.id.post_img);
         imgUserPost = findViewById(R.id.post_userhead);
 
-        currentUserHeadicon = findViewById(R.id.post_currentuser_img);
-
+        currentUserHeadIcon = findViewById(R.id.post_currentuser_img);
 
         txtPostTitle = findViewById(R.id.post_title_view);
         txtPostDesc = findViewById(R.id.post_textview);
@@ -107,15 +108,15 @@ public class PostActivity extends AppCompatActivity {
         editTextComment = findViewById(R.id.comment_edit_multiline_text);
         btnAddComment =findViewById(R.id.comment_button);
         locatePostButton = findViewById(R.id.locate_post_button);
-        // post id传递
-        postItem = new PostItem();
 
+        // post id transfer
+        postItem = new PostItem();
 
         PostKey = bundle.getString("postId"); //bundle.get;
         Log.e("PostKey!",PostKey);
 
 
-
+        // Add click listener for adding new comment
         btnAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -124,11 +125,14 @@ public class PostActivity extends AppCompatActivity {
                 } else {
                     btnAddComment.setVisibility(View.INVISIBLE);
 //                DatabaseReference commentReference = firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY);
+
+                    // Get the comment content
                     String comment_content = editTextComment.getText().toString();
 
+                    // Get the user information
                     String uid = firebaseUser.getUid();
                     String uname;
-                    if (firebaseUser.getDisplayName().equals("")) {
+                    if ("".equals(firebaseUser.getDisplayName())) {
                         if(firebaseUser.getUid().length()>6){
                             uname = "user-" + firebaseUser.getUid().substring(0,5)+"...";
                         }else {
@@ -138,9 +142,10 @@ public class PostActivity extends AppCompatActivity {
                         uname = firebaseUser.getDisplayName();
                     }
 
-                    String uimg = firebaseUser.getPhotoUrl().toString(); //firebaseUser.getPhotoUrl().toString();
+                    // Create the comment document dto
+                    String uImg = Objects.requireNonNull(firebaseUser.getPhotoUrl()).toString(); //firebaseUser.getPhotoUrl().toString();
 
-                    CommentItem comment = new CommentItem(comment_content, uid, uimg, uname);
+                    CommentItem comment = new CommentItem(comment_content, uid, uImg, uname);
                     Map<String, Object> data = new HashMap<>();
                     data.put("CommentContent", comment.getContent());
                     data.put("CommentTime", comment.getTimestamp());
@@ -150,6 +155,7 @@ public class PostActivity extends AppCompatActivity {
 
 //                    Log.d("TAG", "onClick: add data" + comment.getUid());
 
+                    // Store the comment to firebase
                     firebaseFirestore.collection(POST_KEY).document(PostKey).collection(COMMENT_KEY)
                             .add(data)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -174,7 +180,10 @@ public class PostActivity extends AppCompatActivity {
                 }
             }
         });
+
+
         // TODO: 2021/10/29 : add locate button listener
+        // Add click listener for locating post on the map
         locatePostButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -238,7 +247,7 @@ public class PostActivity extends AppCompatActivity {
                             .apply(new RequestOptions()
                                     .placeholder(R.drawable.ic_card_portrait)
                                     .fitCenter())
-                            .into(currentUserHeadicon);
+                            .into(currentUserHeadIcon);
 
                     GlideApp.with(getApplication())
                             .load(gsReference)
@@ -274,6 +283,9 @@ public class PostActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Method for initializing existing comments of the post
+     */
     private void iniRvComment() {
 
 //        Log.d("TAG", "onSuccess11: " + "hellsoosos");

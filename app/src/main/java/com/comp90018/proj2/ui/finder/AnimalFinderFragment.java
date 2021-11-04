@@ -44,11 +44,17 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Fragment for animal finer
+ */
 public class AnimalFinderFragment extends Fragment {
 
+    private static final String TAG = "Extract";
+
+    // Prefix for files in Firebase Storage
     private static final String PREFIX = "gs://mobiletest-e36f3.appspot.com/";
 
-    // store items
+    // Store items
     private ArrayList<CardItem> cardItemArrayList = new ArrayList<>();
     private View view;
     private RecyclerView recyclerView;
@@ -58,19 +64,17 @@ public class AnimalFinderFragment extends Fragment {
     private Spinner spinner;
     private String sp_item;
 
-    private static final String TAG = "Extract";
 
-    // read data from firebase
+    // Read data from firebase
     private FirebaseFirestore firestore_db = FirebaseFirestore.getInstance();
-
     private CollectionReference firestore_reference = firestore_db.
             collection("Post_Temp");
-
     FirebaseStorage storage = FirebaseStorage.getInstance();
 
+    // The current location in GeoPoint
     private GeoPoint current;
 
-    // get the user current location
+    // LocationCommunication to get the user current location
     LocationCommunication mLocationCallback;
 
     @Override
@@ -87,6 +91,7 @@ public class AnimalFinderFragment extends Fragment {
         current = mLocationCallback.getLocation();
         // Log.e("Animal Current onAttach", String.valueOf(current));
     }
+
 
     @Nullable
     @Override
@@ -129,6 +134,9 @@ public class AnimalFinderFragment extends Fragment {
     }
 
 
+    /**
+     * Initialize the main RecycleView
+     */
     private void initRecycleView(){
         recyclerView=(RecyclerView) view.findViewById(R.id.home_item);
         homeAdapter = new HomeAdapter(getActivity(),cardItemArrayList,current);
@@ -342,7 +350,7 @@ public class AnimalFinderFragment extends Fragment {
             }
         }
 
-        // need to be overwrited in adapter, enable to click item
+        // need to be overwritten in adapter, enable to click item
         public interface OnItemClickListener{
             void OnItemClick(View view, CardItem cardItem);
         }
