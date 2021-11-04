@@ -79,7 +79,7 @@ public class AccountFragment extends Fragment {
         binding2 = UpdatePasswordBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textAccount;
+        TextView textView = binding.textAccount;
         occupationTxtView = binding.occupationTextview;
         displayNameView = binding.displayNameTextview;
         emailTxtView = binding.emailTextview;
@@ -115,7 +115,7 @@ public class AccountFragment extends Fragment {
         });
 
 
-
+//Load image in to image view
         GlideApp.with(this)
                 .load(String.valueOf(mAuth.getCurrentUser().getPhotoUrl()))
                 .apply(new RequestOptions()
@@ -123,25 +123,31 @@ public class AccountFragment extends Fragment {
                         .fitCenter())
                 .into(userImageView);
 
-        accountViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+
+        textView.setText("Welcome");
+//        accountViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
 
         final Button logoutButton = binding.logout;
         logoutButton.setOnClickListener(view -> {
+
+
             mAuth.signOut();
 
             Intent intent = new Intent();
             intent.setClass(requireActivity().getApplicationContext(), LoginActivity.class);
             startActivity(intent);
+            requireActivity().finish();
+
 
         });
 
 
-
+//Update button action for updating user image and name
         final Button updateButton = binding.update;
         updateButton.setOnClickListener(view -> {
             String newDisplayName = displayNameView.getText().toString();
@@ -158,6 +164,7 @@ public class AccountFragment extends Fragment {
 
         });
 
+//Reset password button for open the password reset window
         final Button resetPasswordButton = binding.resetPassword;
         resetPasswordButton.setOnClickListener(view -> {
 
@@ -229,6 +236,8 @@ public class AccountFragment extends Fragment {
 
 
     }
+
+//    Select image function for selecting user image
     private void selectImage() {
 //        Intent intent = new Intent(SendPostActivity.this, PhotoActivity.class);
         EasyPhotos.createAlbum(this, true, false, GlideEngine.getInstance())
@@ -255,7 +264,7 @@ public class AccountFragment extends Fragment {
     }
 
 
-
+//Save image and get the url for the image
     private void saveIcon(FirebaseUser currentUser) {
         String[] filename = currIconPath.split("\\.");
         BitmapFactory.Options opts = new BitmapFactory.Options();
@@ -294,6 +303,8 @@ public class AccountFragment extends Fragment {
             }
         });
     }
+
+//    Update user profile to firebase
     private void updateUserProfile(Uri photoUrl) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) return;
