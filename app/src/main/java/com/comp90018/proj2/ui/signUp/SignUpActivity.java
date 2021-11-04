@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.comp90018.proj2.R;
 import com.comp90018.proj2.databinding.ActivitySignUpBinding;
 import com.comp90018.proj2.ui.photo.GlideEngine;
 import com.google.android.gms.tasks.Continuation;
@@ -35,10 +35,10 @@ import com.google.firebase.storage.UploadTask;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -60,7 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText tEmail;
     private EditText tPassword;
     private EditText tDisplayName;
-    private ProgressBar loadingProgressBar;
+    private AVLoadingIndicatorView loading;
 
     // Icon path
     private String currIconPath;
@@ -85,7 +85,7 @@ public class SignUpActivity extends AppCompatActivity {
         tEmail = binding.email;
         tPassword = binding.password;
         tDisplayName = binding.displayName;
-        loadingProgressBar = binding.loading;
+        loading = binding.loading;
 
         // Icon Button
         bIcon.setOnClickListener(v -> {
@@ -143,16 +143,14 @@ public class SignUpActivity extends AppCompatActivity {
         // Sign Up
         bSignup.setOnClickListener(v -> {
             Log.i(TAG, "onClick: ");
-            loadingProgressBar.setVisibility(View.VISIBLE);
+            loading.show();
 
             // [START sign up]
             signUp();
             // [END sign up]
-
-            loadingProgressBar.setVisibility(View.INVISIBLE);
         });
 
-
+        loading.hide();
     }
 
     private void saveIcon(String userId) {
@@ -186,8 +184,9 @@ public class SignUpActivity extends AppCompatActivity {
 //                    iconUri = task.getResult().getPath();
                     updateUserProfile(task.getResult());
                 } else {
-                    // Handle failures
-                    // ...
+                    loading.hide();
+                    Toast.makeText(getApplicationContext(), R.string.error_sign_up, Toast.LENGTH_LONG).show();
+
                 }
             }
         });
@@ -269,6 +268,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Log.i(TAG, "Display Name = " + user.getDisplayName());
                             Log.i(TAG, "Uri = " + String.valueOf(user.getPhotoUrl()));
                         }
+                        loading.hide();
                     }
                 });
         finish();

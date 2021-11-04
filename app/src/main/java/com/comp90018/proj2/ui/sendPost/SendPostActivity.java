@@ -1,6 +1,5 @@
 package com.comp90018.proj2.ui.sendPost;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -54,6 +52,7 @@ import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.callback.SelectCallback;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
 import com.kyleduo.switchbutton.SwitchButton;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ public class SendPostActivity extends AppCompatActivity {
     SwitchButton bPostType;
     EditText tPostSpecies;
     Button bSendPost;
-    ProgressBar loadingProgressBar;
+    AVLoadingIndicatorView loading;
     private SendPostViewModel sendPostViewModel;
     private ActivitySendPostBinding binding;
 
@@ -169,7 +168,7 @@ public class SendPostActivity extends AppCompatActivity {
         tPostSpecies = binding.textPostSpecies;
         bPostType = binding.switchPostType;
         bSendPost = binding.sendPost;
-        loadingProgressBar = binding.loading;
+        loading = binding.loading;
 
 
         // Latitude & Longitude: onChange Validation
@@ -212,7 +211,8 @@ public class SendPostActivity extends AppCompatActivity {
         // sendPostButton: add ClickListener
         bSendPost.setOnClickListener(v -> {
             Log.i(TAG, "onClick: ");
-            loadingProgressBar.setVisibility(View.VISIBLE);
+            loading.show();
+//            loadingProgressBar.setVisibility(View.VISIBLE);
 
             // Check image selected.
             if (currentFilePath == null || "".equals(currentFilePath)) {
@@ -224,7 +224,6 @@ public class SendPostActivity extends AppCompatActivity {
             post();
             // [END send post]
 
-            loadingProgressBar.setVisibility(View.INVISIBLE);
         });
 
         newImageButton.setOnClickListener(v -> {
@@ -238,6 +237,7 @@ public class SendPostActivity extends AppCompatActivity {
         bUpdateLocation.setOnClickListener(v -> {
             getDeviceLocation();
         });
+        loading.hide();
     }
 
 
@@ -301,7 +301,7 @@ public class SendPostActivity extends AppCompatActivity {
      */
     private void post() {
         // [START send post to firebase]
-        loadingProgressBar.setVisibility(View.VISIBLE);
+//        loading.setVisibility(View.VISIBLE);
 
         Log.i(TAG, "bSendPostButton: clicked");
 
@@ -349,14 +349,16 @@ public class SendPostActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
                 }
+                loading.hide();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Toast.makeText(getApplicationContext(), R.string.error_upload_image, Toast.LENGTH_LONG).show();
+                loading.hide();
             }
         });
-        loadingProgressBar.setVisibility(View.INVISIBLE);
+//        loading.setVisibility(View.INVISIBLE);
         // [END send post to firebase]
     }
 

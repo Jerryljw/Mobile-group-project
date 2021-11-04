@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.Objects;
 
@@ -47,6 +48,15 @@ public class LoginActivity extends AppCompatActivity {
      */
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseAuth.AuthStateListener mAuthListener;
+
+    // Fields
+    EditText usernameEditText;
+    EditText passwordEditText;
+    Button loginButton;
+    TextView signUpText;
+    AVLoadingIndicatorView loading;
+    ImageView logoImage;
+
 
     @Override
     protected void onStart() {
@@ -74,12 +84,12 @@ public class LoginActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate: ");
 
-        final EditText usernameEditText = binding.email;
-        final EditText passwordEditText = binding.password;
-        final Button loginButton = binding.login;
-        final TextView signUpText = binding.signUp;
-        final ProgressBar loadingProgressBar = binding.loading;
-        final ImageView logoImage = binding.logo;
+        usernameEditText = binding.email;
+        passwordEditText = binding.password;
+        loginButton = binding.login;
+        signUpText = binding.signUp;
+        loading = binding.loading;
+        logoImage = binding.logo;
 
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -122,6 +132,7 @@ public class LoginActivity extends AppCompatActivity {
         // [START auth_state_listener] ,this method execute as soon as there is a change in Auth status , such as user sign in or sign out.
         mAuthListener = firebaseAuth -> {
             FirebaseUser user = firebaseAuth.getCurrentUser();
+            loading.hide();
 
             if (user != null) {
                 Log.i(TAG, "Display Name = " + user.getDisplayName());
@@ -138,13 +149,12 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton.setOnClickListener(v -> {
             Log.i(TAG, "onClick: ");
-            loadingProgressBar.setVisibility(View.VISIBLE);
+            loading.show();
 
             // [START login]
             login(usernameEditText.getText().toString(), passwordEditText.getText().toString());
             // [END login]
 
-            loadingProgressBar.setVisibility(View.INVISIBLE);
         });
 
         // [START sign_up_click_listener]
@@ -162,6 +172,8 @@ public class LoginActivity extends AppCompatActivity {
                 .apply(new RequestOptions()
                         .fitCenter())
                 .into(logoImage);
+
+        loading.hide();
     }
 
     private void login(String email, String password) {
@@ -184,9 +196,10 @@ public class LoginActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             Log.e(TAG, "signInWithEmail: " + e.getMessage());
                         }
-                    }
+                    };
                 });
     }
+
     private void updateUiWithUser(@NonNull FirebaseUser user) {
         String welcome = getString(R.string.welcome) + user.getEmail();
         // TODO : initiate successful logged in experience
@@ -198,6 +211,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showLoginFailed() {
-        Toast.makeText(getApplicationContext(), R.string.error_password, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.invalid_password, Toast.LENGTH_SHORT).show();
     }
 }

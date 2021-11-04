@@ -18,6 +18,8 @@
     <string name="error_password">Your password is wrong, please check.</string>
     <string name="login_failed">"Login failed"</string>
     <string name="action_log_out">Logout</string>
+    <string name="error_sign_up">Sign up failed. Please try again.</string>
+
 
     <!-- Map -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBfmr1rVOy-KeXKioqwzjzEMKIQ0Fow4ek</string>
