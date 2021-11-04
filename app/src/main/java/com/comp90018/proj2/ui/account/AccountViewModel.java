@@ -17,8 +17,6 @@ public class AccountViewModel extends ViewModel {
         mText.setValue("This is account fragment");
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
-            String welcome = "Welcome " + currentUser.getEmail() + "\n";
-            mText.setValue(welcome + mText.getValue());
             mText.setValue("Welcome");
         }
     }
